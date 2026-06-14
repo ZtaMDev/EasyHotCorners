@@ -7,11 +7,16 @@
     <title>EasyHotCorners — Hot Corner Manager for Windows</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link rel="stylesheet" href="style.css">
+    <!-- PrismJS Theme for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 </head>
 <body>
+
+    <!-- Animated background canvas -->
+    <canvas id="canvas-particles"></canvas>
 
     <!-- Animated corner indicators -->
     <div class="corner-glow corner-glow--tl"></div>
@@ -21,7 +26,6 @@
 
     <!-- ===== HERO ===== -->
     <header id="hero" class="hero">
-        <div class="hero__particles" id="particles"></div>
         <div class="hero__content">
             <div class="hero__logo-wrapper">
                 <svg class="hero__logo" width="80" height="80" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -142,18 +146,18 @@
                     </div>
                     <span class="code-window__title">my_custom_action.py</span>
                 </div>
-                <pre class="code-window__body"><code><span class="kw">import</span> <span class="mod">subprocess</span>
-<span class="kw">import</span> <span class="mod">os</span>
+                <pre class="code-window__body"><code class="language-python">import subprocess
+import os
 
-<span class="cm"># Open your favorite app when you hit the corner</span>
-<span class="kw">def</span> <span class="fn">main</span>():
-    app_path = <span class="str">r"C:\Program Files\Obsidian\Obsidian.exe"</span>
-    <span class="kw">if</span> os.path.exists(app_path):
+# Open your favorite app when you hit the corner
+def main():
+    app_path = r"C:\Program Files\Obsidian\Obsidian.exe"
+    if os.path.exists(app_path):
         subprocess.Popen([app_path])
-    <span class="kw">else</span>:
-        <span class="fn">print</span>(<span class="str">"App not found"</span>)
+    else:
+        print("App not found")
 
-<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+if __name__ == "__main__":
     main()</code></pre>
             </div>
             <p class="scripting__hint">Save to <code>%APPDATA%\EasyHotCorners\scripts\</code> and it will appear in the Settings window.</p>
@@ -192,6 +196,9 @@
         </div>
     </footer>
 
+    <!-- PrismJS Scripts for code syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

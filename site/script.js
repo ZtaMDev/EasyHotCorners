@@ -1,5 +1,5 @@
 /* ======================================================
-   EasyHotCorners — Animations & Interactions
+   EasyHotCorners — Premium Animations & Interactions
    ====================================================== */
 
 // ===== Intersection Observer for feature cards =====
@@ -49,47 +49,133 @@ document.addEventListener("mousemove", (e) => {
     glows.br.classList.toggle("active", distBR < THRESHOLD);
 });
 
-// ===== Floating particles in hero =====
-const particleContainer = document.getElementById("particles");
+// ===== Canvas Particle Background (High Performance) =====
+const canvas = document.getElementById("canvas-particles");
+const ctx = canvas.getContext("2d");
 
-function createParticle() {
-    const el = document.createElement("div");
-    const size = Math.random() * 3 + 1;
-    el.style.cssText = `
-        position: absolute;
-        width: ${size}px;
-        height: ${size}px;
-        background: rgba(167, 139, 250, ${Math.random() * 0.3 + 0.1});
-        border-radius: 50%;
-        left: ${Math.random() * 100}%;
-        top: ${Math.random() * 100}%;
-        animation: particleDrift ${Math.random() * 10 + 10}s linear infinite;
-        pointer-events: none;
-    `;
-    particleContainer.appendChild(el);
+let particles = [];
+let mouse = { x: null, y: null, radius: 150 };
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+    }
+    update() {
+        // Natural drift
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // Bounce/Wrap borders
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+
+        // Push effect from mouse
+        if (mouse.x !== null && mouse.y !== null) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const distance = Math.hypot(dx, dy);
+            if (distance < mouse.radius) {
+                const force = (mouse.radius - distance) / mouse.radius;
+                const forceX = (dx / distance) * force * 1.5;
+                const forceY = (dy / distance) * force * 1.5;
+                this.x -= forceX;
+                this.y -= forceY;
+            }
+        }
+    }
+    draw() {
+        ctx.fillStyle = "rgba(167, 139, 250, 0.35)";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fill();
+    }
 }
 
-// Generate particles
-for (let i = 0; i < 40; i++) createParticle();
-
-// Inject the particle drift keyframes
-const style = document.createElement("style");
-style.textContent = `
-    @keyframes particleDrift {
-        0%   { transform: translate(0, 0) scale(1);   opacity: 0; }
-        10%  { opacity: 1; }
-        90%  { opacity: 1; }
-        100% { transform: translate(${Math.random() > 0.5 ? '' : '-'}60px, -120px) scale(0.5); opacity: 0; }
+function initParticles() {
+    particles = [];
+    const count = Math.min(80, Math.floor((canvas.width * canvas.height) / 20000));
+    for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
     }
-`;
-document.head.appendChild(style);
+}
+initParticles();
+
+// Debounce resize particle initialization
+let resizeTimeout;
+window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(initParticles, 200);
+});
+
+// Track mouse position on canvas
+window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+window.addEventListener("mouseleave", () => {
+    mouse.x = null;
+    mouse.y = null;
+});
+
+// Animation Loop
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < 110) {
+                const alpha = (110 - dist) / 110 * 0.12;
+                ctx.strokeStyle = `rgba(167, 139, 250, ${alpha})`;
+                ctx.lineWidth = 0.6;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+            }
+        }
+    }
+    requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+
+// ===== Card spotlight glow (Premium hover effect) =====
+document.querySelectorAll(".feature-card").forEach((card) => {
+    card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty("--mouse-x", `${x}px`);
+        card.style.setProperty("--mouse-y", `${y}px`);
+    });
+});
 
 // ===== Hide scroll hint on scroll =====
 const scrollHint = document.getElementById("scrollHint");
-window.addEventListener("scroll", () => {
-    if (window.scrollY > 80) {
-        scrollHint.style.opacity = "0";
-    } else {
-        scrollHint.style.opacity = "";
-    }
-}, { passive: true });
+if (scrollHint) {
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 80) {
+            scrollHint.style.opacity = "0";
+        } else {
+            scrollHint.style.opacity = "";
+        }
+    }, { passive: true });
+}

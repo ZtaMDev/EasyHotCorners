@@ -4,6 +4,8 @@
 
 A lightweight, modular hot corner manager for Windows 11. Assign actions to any corner of your screen and trigger them by moving your mouse to that corner, with animated feedback and full per-corner customization.
 
+**[Official Website](https://easy-hot-corners.vercel.app/)**
+
 ---
 
 ## Features
