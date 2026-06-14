@@ -95,6 +95,9 @@ class SettingsUI(QWidget):
             
             chk_enabled = QCheckBox(t("enable", self.lang))
             chk_enabled.setChecked(corner_data.get("enabled", False))
+
+            chk_maximized = QCheckBox(t("allow_maximized", self.lang))
+            chk_maximized.setChecked(corner_data.get("allow_maximized", False))
             
             # Action
             action_layout = QHBoxLayout()
@@ -141,6 +144,7 @@ class SettingsUI(QWidget):
             delay_layout.addWidget(spin_delay)
             
             glayout.addWidget(chk_enabled)
+            glayout.addWidget(chk_maximized)
             glayout.addLayout(action_layout)
             glayout.addLayout(anim_layout)
             glayout.addLayout(color_layout)
@@ -151,6 +155,7 @@ class SettingsUI(QWidget):
             
             self.corner_widgets[corner] = {
                 "enabled": chk_enabled,
+                "allow_maximized": chk_maximized,
                 "action": combo_action,
                 "animation": combo_anim,
                 "color": btn_color,
@@ -172,6 +177,7 @@ class SettingsUI(QWidget):
         for corner, widgets in self.corner_widgets.items():
             self.settings["corners"][corner] = {
                 "enabled": widgets["enabled"].isChecked(),
+                "allow_maximized": widgets["allow_maximized"].isChecked(),
                 "action_id": widgets["action"].currentData(),
                 "animation": widgets["animation"].currentData(),
                 "color": widgets["color"].color_hex,

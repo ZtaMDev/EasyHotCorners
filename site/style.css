@@ -207,6 +207,7 @@ code {
 .hero__title-easy  { color: #a1a1aa; }
 .hero__title-hot   { 
     background: linear-gradient(135deg, #a78bfa 0%, #c084fc 50%, #818cf8 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

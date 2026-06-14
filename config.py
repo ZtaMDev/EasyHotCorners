@@ -10,10 +10,10 @@ DEFAULT_SETTINGS = {
     "language": "en",
     "theme": "system",
     "corners": {
-        "TOP_LEFT": {"enabled": True, "action_id": "toggle_desktop_icons", "delay": 0.6, "animation": "pulse", "color": "#ffffff"},
-        "TOP_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff"},
-        "BOTTOM_LEFT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff"},
-        "BOTTOM_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff"}
+        "TOP_LEFT": {"enabled": True, "action_id": "toggle_desktop_icons", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": False},
+        "TOP_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": True},
+        "BOTTOM_LEFT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": True},
+        "BOTTOM_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": True}
     }
 }
 
@@ -38,18 +38,28 @@ def load_settings():
     try:
         with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
             settings = json.load(f)
+            modified = False
             # Merge with defaults
             for key, val in DEFAULT_SETTINGS.items():
                 if key not in settings:
                     settings[key] = val
+                    modified = True
             for corner, val in DEFAULT_SETTINGS['corners'].items():
                 if corner not in settings['corners']:
                     settings['corners'][corner] = val
+                    modified = True
                 else:
                     if "animation" not in settings['corners'][corner]:
                         settings['corners'][corner]["animation"] = "pulse"
+                        modified = True
                     if "color" not in settings['corners'][corner]:
                         settings['corners'][corner]["color"] = "#ffffff"
+                        modified = True
+                    if "allow_maximized" not in settings['corners'][corner]:
+                        settings['corners'][corner]["allow_maximized"] = val.get("allow_maximized", False)
+                        modified = True
+            if modified:
+                save_settings(settings)
             return settings
     except Exception:
         return DEFAULT_SETTINGS.copy()

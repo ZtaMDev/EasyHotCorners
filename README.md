@@ -15,12 +15,20 @@ A lightweight, modular hot corner manager for Windows 11. Assign actions to any 
 - **Custom animation color** — Choose any color per corner via a built-in color picker.
 - **Configurable delay** — Set how long the mouse must dwell in a corner before the action fires (0.1 s – 5.0 s).
 - **System Tray integration** — The application lives in the Windows system tray. No persistent window is shown while idle.
-- **Desktop-only activation** — Hot corners are suppressed when a fullscreen or maximized application is in the foreground, preventing accidental triggers.
+- **Smart Window suppression** — Hot corners are automatically suppressed when a fullscreen application is active. Activation in maximized applications can be toggled on or off individually per corner.
 - **Built-in actions:**
   - Toggle desktop icons (show / hide)
   - Lock screen
   - Show desktop (Win + D)
   - Mute / unmute system volume
+  - Task View (Win + Tab)
+  - Start Menu (Win)
+  - Quick Settings (Win + A)
+  - Notification Center (Win + N)
+  - Widgets Board (Win + W)
+  - Next Virtual Desktop (Win + Ctrl + Right)
+  - Previous Virtual Desktop (Win + Ctrl + Left)
+  - Task Manager (Ctrl + Shift + Esc)
 - **Custom Python scripts** — Drop any `.py` file into the scripts folder and it will appear as a selectable action inside the settings window.
 - **Extensible API** — An `easy_api.py` file is provided in the scripts folder as a reusable helper base you can import from your own scripts.
 - **Theme support** — Dark, Light, or automatic System theme (reads the Windows registry).
@@ -70,15 +78,16 @@ The application starts silently in the system tray. Right-click the tray icon to
 
 All settings are stored in `%APPDATA%\EasyHotCorners\settings.json` and are edited through the graphical settings window. No manual JSON editing is required.
 
-| Setting   | Description                                         |
-| --------- | --------------------------------------------------- |
-| Language  | Interface language (English or Spanish).            |
-| Theme     | Color scheme: System (auto-detect), Dark, or Light. |
-| Enable    | Toggle a corner on or off individually.             |
-| Action    | Built-in action or custom script to execute.        |
-| Animation | Visual style shown while dwelling in the corner.    |
-| Color     | Color of the animation overlay.                     |
-| Delay     | Dwell time in seconds before the action fires.      |
+| Setting         | Description                                                          |
+| --------------- | -------------------------------------------------------------------- |
+| Language        | Interface language (English or Spanish).                             |
+| Theme           | Color scheme: System (auto-detect), Dark, or Light.                  |
+| Enable          | Toggle a corner on or off individually.                              |
+| Allow Maximized | Allow hot corner triggers even if a window is maximized (optional).   |
+| Action          | Built-in action or custom script to execute.                         |
+| Animation       | Visual style shown while dwelling in the corner.                      |
+| Color           | Color of the animation overlay.                                      |
+| Delay           | Dwell time in seconds before the action fires.                       |
 
 ---
 

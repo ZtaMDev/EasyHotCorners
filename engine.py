@@ -6,25 +6,26 @@ import win32gui
 from PySide6.QtCore import QObject, QTimer, Signal
 from config import load_settings
 
-def is_fullscreen_or_maximized_active():
+def get_foreground_window_state():
     hwnd = win32gui.GetForegroundWindow()
-    if not hwnd: return False
+    if not hwnd: return "normal"
     class_name = win32gui.GetClassName(hwnd)
     if class_name in ("Progman", "WorkerW", "Qt5QWindowIcon", "Qt6QWindowIcon"):
-        return False
+        return "normal"
+    # Check maximized placement first (since maximized windows can have a rect larger than the screen size)
+    try:
+        placement = win32gui.GetWindowPlacement(hwnd)
+        if placement[1] == win32con.SW_SHOWMAXIMIZED:
+            return "maximized"
+    except: pass
     rect = win32gui.GetWindowRect(hwnd)
     win_w = rect[2] - rect[0]
     win_h = rect[3] - rect[1]
     screen_w = win32api.GetSystemMetrics(win32con.SM_CXSCREEN)
     screen_h = win32api.GetSystemMetrics(win32con.SM_CYSCREEN)
     if win_w >= screen_w and win_h >= screen_h:
-        return True
-    try:
-        placement = win32gui.GetWindowPlacement(hwnd)
-        if placement[1] == win32con.SW_SHOWMAXIMIZED:
-            return True
-    except: pass
-    return False
+        return "fullscreen"
+    return "normal"
 
 class HotCornerEngine(QObject):
     # Emit (corner_id) when entered, (corner_id, progress) while in it, (corner_id) when triggered, (corner_id) when exited
@@ -76,8 +77,16 @@ class HotCornerEngine(QObject):
                 self.timer_val = 0.0
                 
                 # Prevent triggers if full screen is active or cooldown
-                if time.time() - self.last_toggle_time > 1.5 and not is_fullscreen_or_maximized_active():
-                    self.corner_entered.emit(self.active_corner)
+                cooldown_ok = (time.time() - self.last_toggle_time > 1.5)
+                if cooldown_ok:
+                    state = get_foreground_window_state()
+                    allow_maximized = corners.get(self.active_corner, {}).get("allow_maximized", False)
+                    if state == "fullscreen":
+                        self.active_corner = None # Blocked
+                    elif state == "maximized" and not allow_maximized:
+                        self.active_corner = None # Blocked
+                    else:
+                        self.corner_entered.emit(self.active_corner)
                 else:
                     self.active_corner = None # Blocked
                     
