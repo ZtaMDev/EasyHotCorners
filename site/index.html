@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EasyHotCorners — A lightweight, modular hot corner manager for Windows 11. Assign actions to screen corners with animated feedback.">
+    <title>EasyHotCorners — Hot Corner Manager for Windows</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Animated corner indicators -->
+    <div class="corner-glow corner-glow--tl"></div>
+    <div class="corner-glow corner-glow--tr"></div>
+    <div class="corner-glow corner-glow--bl"></div>
+    <div class="corner-glow corner-glow--br"></div>
+
+    <!-- ===== HERO ===== -->
+    <header id="hero" class="hero">
+        <div class="hero__particles" id="particles"></div>
+        <div class="hero__content">
+            <div class="hero__logo-wrapper">
+                <svg class="hero__logo" width="80" height="80" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="64" height="64" rx="12" fill="#000"/>
+                    <rect x="16" y="16" width="32" height="32" rx="4" fill="#fff"/>
+                    <rect x="24" y="24" width="16" height="16" rx="2" fill="#000"/>
+                </svg>
+            </div>
+            <h1 class="hero__title">
+                <span class="hero__title-easy">Easy</span><span class="hero__title-hot">Hot</span><span class="hero__title-corners">Corners</span>
+            </h1>
+            <p class="hero__subtitle">A lightweight, modular hot corner manager for Windows 11.<br>Assign actions to any corner of your screen with animated visual feedback.</p>
+            <div class="hero__buttons">
+                <a href="https://github.com/ZtaMDev/EasyHotCorners/releases/download/v1.0.0/EasyHotCorners_v1.0.0.exe" class="btn btn--primary" id="downloadBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download for Windows
+                </a>
+                <a href="https://github.com/ZtaMDev/EasyHotCorners" class="btn btn--outline" target="_blank" rel="noopener">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </a>
+                <a href="https://github.com/ZtaMDev" class="btn btn--ghost" target="_blank" rel="noopener">
+                    ZMDev
+                </a>
+            </div>
+            <p class="hero__version">v1.0.0 — Free &amp; Open Source</p>
+        </div>
+        <div class="hero__scroll-hint" id="scrollHint">
+            <span>Scroll to explore</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+    </header>
+
+    <!-- ===== FEATURES ===== -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Features</h2>
+            <p class="section-subtitle">Everything you need to supercharge your desktop workflow.</p>
+            <div class="features__grid">
+
+                <div class="feature-card" data-delay="0">
+                    <div class="feature-card__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
+                    </div>
+                    <h3>4 Independent Corners</h3>
+                    <p>Configure each corner individually with its own action, animation style, color, and dwell delay.</p>
+                </div>
+
+                <div class="feature-card" data-delay="1">
+                    <div class="feature-card__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <h3>Smooth 60fps Animations</h3>
+                    <p>Four animation styles — Arc, Corner Bar, Pulse, Fade Box — rendered with Qt hardware acceleration.</p>
+                </div>
+
+                <div class="feature-card" data-delay="2">
+                    <div class="feature-card__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <h3>Desktop-Only Activation</h3>
+                    <p>Hot corners are suppressed when a fullscreen or maximized app is active. No accidental triggers.</p>
+                </div>
+
+                <div class="feature-card" data-delay="3">
+                    <div class="feature-card__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v18"/><path d="M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>
+                    </div>
+                    <h3>Custom Colors</h3>
+                    <p>Pick any animation color per corner using a native color picker. Match your desktop aesthetic.</p>
+                </div>
+
+                <div class="feature-card" data-delay="4">
+                    <div class="feature-card__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </div>
+                    <h3>Custom Python Scripts</h3>
+                    <p>Drop a <code>.py</code> file into the scripts folder and it appears as a selectable action instantly.</p>
+                </div>
+
+                <div class="feature-card" data-delay="5">
+                    <div class="feature-card__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <h3>Theme &amp; Language</h3>
+                    <p>Dark, Light, or System auto-detect themes. English and Spanish out of the box.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== BUILT-IN ACTIONS ===== -->
+    <section id="actions" class="actions">
+        <div class="container">
+            <h2 class="section-title">Built-in Actions</h2>
+            <p class="section-subtitle">Ready to use, no configuration needed.</p>
+            <div class="actions__list">
+                <div class="action-pill">Toggle Desktop Icons</div>
+                <div class="action-pill">Lock Screen</div>
+                <div class="action-pill">Show Desktop (Win+D)</div>
+                <div class="action-pill">Mute / Unmute Volume</div>
+                <div class="action-pill">Run Custom Script</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SCRIPT EXAMPLE ===== -->
+    <section id="scripting" class="scripting">
+        <div class="container">
+            <h2 class="section-title">Custom Scripts</h2>
+            <p class="section-subtitle">Extend EasyHotCorners with your own Python scripts. Drop a <code>.py</code> file into the scripts folder and it shows up as an action.</p>
+
+            <div class="code-window">
+                <div class="code-window__header">
+                    <div class="code-window__dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <span class="code-window__title">my_custom_action.py</span>
+                </div>
+                <pre class="code-window__body"><code><span class="kw">import</span> <span class="mod">subprocess</span>
+<span class="kw">import</span> <span class="mod">os</span>
+
+<span class="cm"># Open your favorite app when you hit the corner</span>
+<span class="kw">def</span> <span class="fn">main</span>():
+    app_path = <span class="str">r"C:\Program Files\Obsidian\Obsidian.exe"</span>
+    <span class="kw">if</span> os.path.exists(app_path):
+        subprocess.Popen([app_path])
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">"App not found"</span>)
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    main()</code></pre>
+            </div>
+            <p class="scripting__hint">Save to <code>%APPDATA%\EasyHotCorners\scripts\</code> and it will appear in the Settings window.</p>
+        </div>
+    </section>
+
+    <!-- ===== DOWNLOAD CTA ===== -->
+    <section id="download" class="download-cta">
+        <div class="container">
+            <h2>Ready to optimize your workflow?</h2>
+            <p>EasyHotCorners is free, open source, and takes less than 5 MB.</p>
+            <a href="https://github.com/ZtaMDev/EasyHotCorners/releases/download/v1.0.0/EasyHotCorners_v1.0.0.exe" class="btn btn--primary btn--lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download v1.0.0
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer__inner">
+            <div class="footer__brand">
+                <svg width="28" height="28" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="64" height="64" rx="12" fill="#000"/>
+                    <rect x="16" y="16" width="32" height="32" rx="4" fill="#fff"/>
+                    <rect x="24" y="24" width="16" height="16" rx="2" fill="#000"/>
+                </svg>
+                <span>EasyHotCorners</span>
+            </div>
+            <nav class="footer__links">
+                <a href="https://github.com/ZtaMDev/EasyHotCorners" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://github.com/ZtaMDev/EasyHotCorners/releases" target="_blank" rel="noopener">Releases</a>
+                <a href="https://github.com/ZtaMDev" target="_blank" rel="noopener">ZMDev</a>
+            </nav>
+            <p class="footer__copy">Built by <a href="https://github.com/ZtaMDev" target="_blank" rel="noopener">ZMDev</a>. Free and open source.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
