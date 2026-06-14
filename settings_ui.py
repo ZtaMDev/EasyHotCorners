@@ -190,4 +190,8 @@ class SettingsUI(QWidget):
             enable_startup()
         else:
             disable_startup()
+            
+        if hasattr(self.engine, 'app_instance'):
+            self.engine.app_instance.update_tray_menu()
+            
         self.hide()

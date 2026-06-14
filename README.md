@@ -93,7 +93,10 @@ All settings are stored in `%APPDATA%\EasyHotCorners\settings.json` and are edit
 
 ## Custom Scripts
 
-Place any `.py` file in `%APPDATA%\EasyHotCorners\scripts\`. It will appear automatically as a selectable action in the settings window. Scripts are executed in a new process using the same Python interpreter that runs the application.
+Place any `.py` file in `%APPDATA%\EasyHotCorners\scripts\`. It will appear automatically as a selectable action in the settings window. Scripts are executed in a new process explicitly using the system's `python` interpreter.
+
+> [!IMPORTANT]
+> **Python Required**: To execute custom `.py` scripts, you must have Python installed on your system and added to your environment variables (PATH).
 
 An `easy_api.py` helper file is generated in the same scripts folder on first launch. It can be imported from your own scripts and edited freely.
 

@@ -122,4 +122,8 @@ def execute_action(action_id, scripts_dir):
     else:
         script_path = os.path.join(scripts_dir, action_id)
         if os.path.exists(script_path) and script_path.endswith('.py'):
-            subprocess.Popen([sys.executable, script_path], creationflags=subprocess.CREATE_NO_WINDOW)
+            python_exe = "python" if getattr(sys, 'frozen', False) else sys.executable
+            try:
+                subprocess.Popen([python_exe, script_path], creationflags=subprocess.CREATE_NO_WINDOW)
+            except Exception as e:
+                print(f"Failed to execute script {script_path}: {e}")

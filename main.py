@@ -72,6 +72,7 @@ class EasyHotCornersApp:
         
         # Engine
         self.engine = HotCornerEngine()
+        self.engine.app_instance = self
         
         self.apply_theme()
         
@@ -83,16 +84,24 @@ class EasyHotCornersApp:
         self.overlay = OverlayUI()
         
         # Settings UI
-        self.settings_ui = SettingsUI(self.engine)
-        self.settings_ui.setWindowIcon(self.app_icon)
+        self.settings_ui = None
         
         # Tray Icon
         self.tray = QSystemTrayIcon()
         self.tray.setIcon(self.app_icon)
         self.tray.setToolTip("EasyHotCorners")
         
-        menu = QMenu()
+        self.update_tray_menu()
+        self.tray.show()
         
+        # Connect engine signals
+        self.engine.corner_entered.connect(self.on_corner_entered)
+        self.engine.corner_progress.connect(self.on_corner_progress)
+        self.engine.corner_triggered.connect(self.on_corner_triggered)
+        self.engine.corner_exited.connect(self.on_corner_exited)
+        
+    def update_tray_menu(self):
+        menu = QMenu()
         lang = self.engine.settings.get("language", "en")
         
         settings_action = QAction(t("tray_settings", lang), menu)
@@ -119,17 +128,12 @@ class EasyHotCornersApp:
         menu.addAction(quit_action)
         
         self.tray.setContextMenu(menu)
-        self.tray.show()
-        
-        # Connect engine signals
-        self.engine.corner_entered.connect(self.on_corner_entered)
-        self.engine.corner_progress.connect(self.on_corner_progress)
-        self.engine.corner_triggered.connect(self.on_corner_triggered)
-        self.engine.corner_exited.connect(self.on_corner_exited)
-        
+
     def show_settings(self):
-        if not self.settings_ui:
-            self.settings_ui = SettingsUI(self.engine)
+        if self.settings_ui:
+            self.settings_ui.close()
+        self.settings_ui = SettingsUI(self.engine)
+        self.settings_ui.setWindowIcon(self.app_icon)
         self.apply_theme()
         self.settings_ui.show()
         self.settings_ui.activateWindow()
