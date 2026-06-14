@@ -1,0 +1,21 @@
+# ============================================================
+#  EasyHotCorners - PyInstaller Export Command
+# ============================================================
+#
+
+pyinstaller --noconfirm --onefile --windowed --icon="icon.ico" --name="EasyHotCorners" --add-data "icon.ico;." main.py
+
+# ============================================================
+# OPTIONS EXPLAINED:
+#   --noconfirm       : Overwrite output folder without asking
+#   --onefile         : Bundle everything into a single .exe
+#   --windowed        : No console window (GUI app)
+#   --icon="icon.ico" : App icon shown in Explorer and taskbar
+#   --name            : Output executable name
+#   --add-data        : Bundle icon.ico inside the exe so the
+#                       tray and settings window can load it
+#   main.py           : Entry point
+#
+# OUTPUT:
+#   dist/EasyHotCorners.exe
+# ============================================================
