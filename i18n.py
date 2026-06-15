@@ -35,7 +35,16 @@ TRANSLATIONS = {
         "TOP_LEFT": "Top Left",
         "TOP_RIGHT": "Top Right",
         "BOTTOM_LEFT": "Bottom Left",
-        "BOTTOM_RIGHT": "Bottom Right"
+        "BOTTOM_RIGHT": "Bottom Right",
+        "apply": "Apply",
+        "advanced_options": "Advanced Options",
+        "radius": "Hot Corner Radius (px):",
+        "multi_monitor": "Enable Multi-Monitor Support",
+        "polling_interval": "Polling Interval (ms):",
+        "info_radius": "Size of the trigger area in pixels. Increase if corners are hard to trigger.",
+        "info_multi_monitor": "If enabled, hot corners apply to all connected monitors. Otherwise, only the primary monitor.",
+        "info_polling": "How often to check cursor position. Lower is smoother but uses more CPU. Default: 16ms.",
+        "info_delay": "Time to keep cursor in corner before action triggers."
     },
     "es": {
         "theme": "Tema:",
@@ -73,7 +82,16 @@ TRANSLATIONS = {
         "TOP_LEFT": "Arriba Izquierda",
         "TOP_RIGHT": "Arriba Derecha",
         "BOTTOM_LEFT": "Abajo Izquierda",
-        "BOTTOM_RIGHT": "Abajo Derecha"
+        "BOTTOM_RIGHT": "Abajo Derecha",
+        "apply": "Aplicar",
+        "advanced_options": "Opciones Avanzadas",
+        "radius": "Radio de Hot Corner (px):",
+        "multi_monitor": "Soporte Multi-Monitor",
+        "polling_interval": "Intervalo de sondeo (ms):",
+        "info_radius": "Tamaño del área de activación en píxeles. Auméntalo si te cuesta activar las esquinas.",
+        "info_multi_monitor": "Si se activa, las esquinas funcionarán en todas las pantallas. Si no, solo en la principal.",
+        "info_polling": "Frecuencia de lectura del ratón. Menor es más fluido pero usa más CPU. Por defecto: 16ms.",
+        "info_delay": "Tiempo que debe permanecer el ratón en la esquina para activar la acción."
     }
 }
 

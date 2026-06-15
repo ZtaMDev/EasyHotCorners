@@ -31,6 +31,9 @@ A lightweight, modular hot corner manager for Windows 11. Assign actions to any 
   - Task Manager (Ctrl + Shift + Esc)
 - **Custom Python scripts** — Drop any `.py` file into the scripts folder and it will appear as a selectable action inside the settings window.
 - **Extensible API** — An `easy_api.py` file is provided in the scripts folder as a reusable helper base you can import from your own scripts.
+- **Multi-Monitor Support** — Hot corners can span seamlessly across all connected screens.
+- **Advanced Optimization** — Customize the trigger area radius (pixels) and fine-tune the CPU polling interval for ultimate performance control.
+- **Premium User Interface** — A completely redesigned, dark-themed Settings UI with inline tooltips and live apply.
 - **Theme support** — Dark, Light, or automatic System theme (reads the Windows registry).
 - **Language support** — English and Spanish, selectable from the settings window.
 

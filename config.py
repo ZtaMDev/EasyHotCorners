@@ -9,11 +9,14 @@ SCRIPTS_DIR = os.path.join(APPDATA_DIR, "scripts")
 DEFAULT_SETTINGS = {
     "language": "en",
     "theme": "system",
+    "radius": 10,
+    "multi_monitor": True,
+    "polling_interval": 16,
     "corners": {
-        "TOP_LEFT": {"enabled": True, "action_id": "toggle_desktop_icons", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": False},
-        "TOP_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": True},
-        "BOTTOM_LEFT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": True},
-        "BOTTOM_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.6, "animation": "pulse", "color": "#ffffff", "allow_maximized": True}
+        "TOP_LEFT": {"enabled": True, "action_id": "toggle_desktop_icons", "delay": 0.4, "animation": "pulse", "color": "#ffffff", "allow_maximized": False},
+        "TOP_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.4, "animation": "pulse", "color": "#ffffff", "allow_maximized": True},
+        "BOTTOM_LEFT": {"enabled": False, "action_id": "none", "delay": 0.4, "animation": "pulse", "color": "#ffffff", "allow_maximized": True},
+        "BOTTOM_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.4, "animation": "pulse", "color": "#ffffff", "allow_maximized": True}
     }
 }
 

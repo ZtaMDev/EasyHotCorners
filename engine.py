@@ -44,24 +44,57 @@ class HotCornerEngine(QObject):
         self.timer_val = 0.0
         self.last_toggle_time = 0
         
-        # We run check at ~60fps (16ms)
         self.timer = QTimer()
         self.timer.timeout.connect(self.check_loop)
-        self.timer.start(16)
+        polling = self.settings.get("polling_interval", 16)
+        self.timer.start(polling)
 
     def reload_settings(self):
         self.settings = load_settings()
+        polling = self.settings.get("polling_interval", 16)
+        if self.timer.interval() != polling:
+            self.timer.setInterval(polling)
 
     def check_loop(self):
         x, y = win32api.GetCursorPos()
         
+        radius = self.settings.get("radius", 10)
+        multi_monitor = self.settings.get("multi_monitor", True)
         corners = self.settings.get("corners", {})
         
         current_corner = None
-        if x <= 0 and y <= 0: current_corner = "TOP_LEFT"
-        elif x >= self.screen_w - 1 and y <= 0: current_corner = "TOP_RIGHT"
-        elif x <= 0 and y >= self.screen_h - 1: current_corner = "BOTTOM_LEFT"
-        elif x >= self.screen_w - 1 and y >= self.screen_h - 1: current_corner = "BOTTOM_RIGHT"
+        
+        if multi_monitor:
+            monitors = win32api.EnumDisplayMonitors()
+            for monitor in monitors:
+                _, _, rect = monitor
+                left, top, right, bottom = rect
+                
+                if x <= left + radius and y <= top + radius:
+                    current_corner = "TOP_LEFT"
+                    break
+                elif x >= right - 1 - radius and y <= top + radius:
+                    current_corner = "TOP_RIGHT"
+                    break
+                elif x <= left + radius and y >= bottom - 1 - radius:
+                    current_corner = "BOTTOM_LEFT"
+                    break
+                elif x >= right - 1 - radius and y >= bottom - 1 - radius:
+                    current_corner = "BOTTOM_RIGHT"
+                    break
+        else:
+            left, top = 0, 0
+            right = self.screen_w
+            bottom = self.screen_h
+            
+            if x <= left + radius and y <= top + radius:
+                current_corner = "TOP_LEFT"
+            elif x >= right - 1 - radius and y <= top + radius:
+                current_corner = "TOP_RIGHT"
+            elif x <= left + radius and y >= bottom - 1 - radius:
+                current_corner = "BOTTOM_LEFT"
+            elif x >= right - 1 - radius and y >= bottom - 1 - radius:
+                current_corner = "BOTTOM_RIGHT"
 
         # Check if corner is enabled
         if current_corner and not corners.get(current_corner, {}).get("enabled", False):
@@ -91,8 +124,9 @@ class HotCornerEngine(QObject):
                     self.active_corner = None # Blocked
                     
             if self.active_corner:
-                delay = float(corners[self.active_corner].get("delay", 0.6))
-                self.timer_val += 0.016 # 16ms
+                delay = float(corners[self.active_corner].get("delay", 0.4))
+                polling_s = self.settings.get("polling_interval", 16) / 1000.0
+                self.timer_val += polling_s
                 progress = min(self.timer_val / delay, 1.0)
                 
                 self.corner_progress.emit(self.active_corner, progress)
