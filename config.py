@@ -13,6 +13,7 @@ DEFAULT_SETTINGS = {
     "radius": 10,
     "multi_monitor": True,
     "polling_interval": 16,
+    "block_any_maximized": True,
     "corners": {
         "TOP_LEFT": {"enabled": True, "action_id": "toggle_desktop_icons", "delay": 0.4, "animation": "pulse", "color": "#ffffff", "allow_maximized": False},
         "TOP_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.4, "animation": "pulse", "color": "#ffffff", "allow_maximized": True},

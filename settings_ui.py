@@ -739,10 +739,15 @@ class CornerPanel(QWidget):
 
         root.addWidget(_divider())
 
-        # Enable
+        # Enable + Allow maximized row
+        enable_row = QHBoxLayout()
         self.chk_enable = QCheckBox(t("enable", lang))
         self.chk_enable.setObjectName("enableCheck")
-        root.addWidget(self.chk_enable)
+        enable_row.addWidget(self.chk_enable)
+        enable_row.addStretch()
+        self.chk_maximized = QCheckBox(t("allow_maximized", lang))
+        enable_row.addWidget(self.chk_maximized)
+        root.addLayout(enable_row)
 
         root.addWidget(_divider())
 
@@ -800,10 +805,6 @@ class CornerPanel(QWidget):
         self.spin_delay.setFixedWidth(90)
         delay_row.addWidget(self.spin_delay)
         root.addLayout(delay_row)
-
-        # Allow maximized
-        self.chk_maximized = QCheckBox(t("allow_maximized", lang))
-        root.addWidget(self.chk_maximized)
 
         root.addStretch()
         self.setEnabled(False)
@@ -1027,6 +1028,10 @@ class SettingsUI(QWidget):
         mm_row.addStretch()
         adv_l.addLayout(mm_row)
 
+        self.chk_block_any = QCheckBox(t("block_any_maximized", self.lang))
+        self.chk_block_any.setChecked(self.settings.get("block_any_maximized", True))
+        adv_l.addWidget(self.chk_block_any)
+
         self.adv_widget.setVisible(False)
         sb.addWidget(self.adv_widget)
 
@@ -1165,6 +1170,7 @@ class SettingsUI(QWidget):
         self.settings["radius"] = self.spin_radius.value()
         self.settings["polling_interval"] = self.spin_poll.value()
         self.settings["multi_monitor"] = self.chk_mm.isChecked()
+        self.settings["block_any_maximized"] = self.chk_block_any.isChecked()
 
     def _apply(self):
         self._gather()
