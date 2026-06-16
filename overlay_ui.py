@@ -7,7 +7,8 @@ from PySide6.QtCore import Qt, QRectF, QTimer
 # pyrefly: ignore [missing-import]
 from PySide6.QtGui import QPainter, QColor, QPen, QBrush
 
-FADE_OUT_DURATION_MS = 400  # How long the fade-out lasts after action triggers
+FADE_OUT_DURATION_MS = 400
+FLASH_DURATION_MS = 500
 
 class OverlayUI(QWidget):
     def __init__(self):
@@ -34,9 +35,14 @@ class OverlayUI(QWidget):
         self._fade_timer.setInterval(16)
         self._fade_timer.timeout.connect(self._fade_step)
 
+        self._flash_timer = QTimer()
+        self._flash_timer.setInterval(30)
+        self._flash_timer.timeout.connect(self._flash_tick)
+
     def show_corner(self, corner_id, animation_style="pulse", color="#ffffff"):
-        # Cancel any ongoing fade
+        # Cancel any ongoing fade or flash
         self._fade_timer.stop()
+        self._flash_timer.stop()
         self.fading_out = False
         self.fade_alpha = 1.0
         
@@ -91,6 +97,44 @@ class OverlayUI(QWidget):
         self.progress = 0.0
         self.hide()
 
+    def flash_corner(self, corner_id, animation_style="pulse", color="#ffffff"):
+        """Animated flash for profile switch — grows then fades."""
+        self._fade_timer.stop()
+        self.fading_out = False
+        self.fade_alpha = 1.0
+        self.corner_id = corner_id
+        self.animation_style = animation_style
+        self.animation_color = color
+        self.progress = 0.0
+
+        if corner_id == "TOP_LEFT":
+            self.move(0, 0)
+        elif corner_id == "TOP_RIGHT":
+            self.move(self.screen_w - self.size, 0)
+        elif corner_id == "BOTTOM_LEFT":
+            self.move(0, self.screen_h - self.size)
+        elif corner_id == "BOTTOM_RIGHT":
+            self.move(self.screen_w - self.size, self.screen_h - self.size)
+
+        self.show()
+        self._flash_step = 0
+        self._flash_timer.start()
+
+    def _flash_tick(self):
+        self._flash_step += 1
+        self.progress = min(1.0, self._flash_step / 12)
+        self.update()
+        if self._flash_step >= 24:  # ~720ms grow
+            self._flash_timer.stop()
+            self.progress = 1.0
+            self.update()
+            QTimer.singleShot(FLASH_DURATION_MS, self._trigger_flash_fade)
+
+    def _trigger_flash_fade(self):
+        if self.isVisible():
+            self.fading_out = True
+            self._fade_timer.start()
+
     def paintEvent(self, event):
         if not self.isVisible() or self.progress <= 0:
             return
@@ -107,6 +151,10 @@ class OverlayUI(QWidget):
             self._draw_pulse(painter)
         elif self.animation_style == "fade_box":
             self._draw_fade_box(painter)
+        elif self.animation_style == "ripple":
+            self._draw_ripple(painter)
+        elif self.animation_style == "halo":
+            self._draw_halo(painter)
             
         painter.end()
 
@@ -176,3 +224,43 @@ class OverlayUI(QWidget):
         c.setAlpha(opacity)
         painter.setBrush(QBrush(c))
         painter.drawRoundedRect(rect, 10, 10)
+
+    def _draw_ripple(self, painter):
+        for i in range(3):
+            radius = (self.size * 0.45) * (self.progress - i * 0.15)
+            if radius <= 0:
+                continue
+            alpha = int(180 * (1.0 - i * 0.35) * (1.0 - abs(self.progress - 0.5) * 1.4))
+            alpha = max(0, min(255, alpha))
+            painter.setPen(Qt.PenStyle.NoPen)
+            c = QColor(self.animation_color)
+            c.setAlpha(alpha)
+            painter.setBrush(QBrush(c))
+            self._draw_quarter_circle(painter, radius)
+
+    def _draw_halo(self, painter):
+        progress = min(1.0, self.progress * 1.5)
+        radii = [
+            (self.size * 0.5 * progress, 80),
+            (self.size * 0.35 * progress, 120),
+            (self.size * 0.2 * progress, 200),
+        ]
+        for radius, base_alpha in radii:
+            painter.setPen(Qt.PenStyle.NoPen)
+            c = QColor(self.animation_color)
+            c.setAlpha(int(base_alpha * (1.0 - abs(self.progress - 0.5) * 1.2)))
+            c.setAlpha(max(0, min(255, c.alpha())))
+            painter.setBrush(QBrush(c))
+            self._draw_quarter_circle(painter, radius)
+
+    def _draw_quarter_circle(self, painter, radius):
+        if radius <= 0:
+            return
+        if self.corner_id == "TOP_LEFT":
+            painter.drawEllipse(QRectF(0, 0, radius * 2, radius * 2))
+        elif self.corner_id == "TOP_RIGHT":
+            painter.drawEllipse(QRectF(self.size - radius * 2, 0, radius * 2, radius * 2))
+        elif self.corner_id == "BOTTOM_LEFT":
+            painter.drawEllipse(QRectF(0, self.size - radius * 2, radius * 2, radius * 2))
+        elif self.corner_id == "BOTTOM_RIGHT":
+            painter.drawEllipse(QRectF(self.size - radius * 2, self.size - radius * 2, radius * 2, radius * 2))

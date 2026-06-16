@@ -11,9 +11,9 @@ from PySide6.QtCore import QObject, Signal, QTimer
 from PySide6.QtGui import QIcon, QImage, QPainter, QColor, QPixmap, QAction
 from engine import HotCornerEngine
 from overlay_ui import OverlayUI
-from settings_ui import SettingsUI
+from settings_ui import SettingsUI, ProfileManagerDialog, QSS, QSS_LIGHT
 from actions import execute_action
-from config import init_appdata, APPDATA_DIR, SCRIPTS_DIR
+from config import init_appdata, APPDATA_DIR, SCRIPTS_DIR, load_settings, save_settings, list_profiles, switch_profile, save_profile, load_profile, effective_is_dark
 from i18n import t
 from startup import is_startup_enabled, toggle_startup
 from version import VERSION
@@ -140,6 +140,18 @@ class EasyHotCornersApp:
 
         self._tray_menu.addSeparator()
 
+        # Profiles submenu
+        self._profile_menu = QMenu(t("tray_profiles", lang), self._tray_menu)
+        self._profile_menu.setObjectName("profileMenu")
+        self._populate_profile_menu()
+        self._tray_menu.addMenu(self._profile_menu)
+
+        self._manage_profiles_action = QAction(t("tray_manage_profiles", lang), self._tray_menu)
+        self._manage_profiles_action.triggered.connect(self.show_profile_manager)
+        self._tray_menu.addAction(self._manage_profiles_action)
+
+        self._tray_menu.addSeparator()
+
         self._version_action = QAction(t("version", lang).format(v=VERSION), self._tray_menu)
         self._version_action.setEnabled(False)
         self._tray_menu.addAction(self._version_action)
@@ -171,6 +183,44 @@ class EasyHotCornersApp:
             update_text = f"⬇ {t('update_available', lang).format(latest=self._pending_update['latest'])}"
         self._update_action.setText(update_text)
         self._quit_action.setText(t("tray_quit", lang))
+        self._profile_menu.setTitle(t("tray_profiles", lang))
+        self._manage_profiles_action.setText(t("tray_manage_profiles", lang))
+        self._populate_profile_menu()
+
+    def _populate_profile_menu(self):
+        self._profile_menu.clear()
+        current = self.engine.settings.get("current_profile", "Default")
+        profiles = list_profiles()
+        for p in profiles:
+            action = QAction(p, self._profile_menu)
+            action.setCheckable(True)
+            action.setChecked(p == current)
+            action.setData(p)
+            action.triggered.connect(lambda checked, name=p: self._on_tray_profile_switch(name))
+            self._profile_menu.addAction(action)
+
+    def _on_tray_profile_switch(self, name):
+        if name == self.engine.settings.get("current_profile", "Default"):
+            return
+        if switch_profile(name):
+            self.engine.settings = load_settings()
+            # Update tray
+            self._populate_profile_menu()
+            self.update_tray_menu()
+            self.engine.reload_settings()
+            # Animate profile corners
+            self._animate_profile_switch(name)
+
+    def _animate_profile_switch(self, name):
+        profile_data = load_profile(name)
+        if profile_data is None:
+            return
+        corners = profile_data.get("corners", {})
+        enabled = [(cid, c) for cid, c in corners.items() if c.get("enabled", False)]
+        for i, (cid, c) in enumerate(enabled):
+            color = c.get("color", "#ffffff")
+            anim = c.get("animation", "pulse")
+            QTimer.singleShot(200 * i, lambda cid=cid, a=anim, cl=color: self.overlay.flash_corner(cid, a, cl))
 
     def show_settings(self):
         if self.settings_ui:
@@ -180,6 +230,17 @@ class EasyHotCornersApp:
         self.apply_theme()
         self.settings_ui.show()
         self.settings_ui.activateWindow()
+
+    def show_profile_manager(self):
+        lang = self.engine.settings.get("language", "en")
+        is_dark = effective_is_dark(self.engine.settings)
+        dlg = ProfileManagerDialog(self.engine.settings, lang, is_dark, None)
+        dlg.setStyleSheet(QSS if is_dark else QSS_LIGHT)
+        dlg.exec()
+        self.engine.settings = load_settings()
+        self._populate_profile_menu()
+        self.update_tray_menu()
+        self.engine.reload_settings()
 
     def apply_theme(self):
         theme = self.engine.settings.get("theme", "system")
@@ -297,9 +358,22 @@ class EasyHotCornersApp:
         self.overlay.set_progress(progress)
 
     def on_corner_triggered(self, corner_id):
-        action_id = self.engine.settings["corners"][corner_id].get("action_id", "none")
-        execute_action(action_id, SCRIPTS_DIR)
-        self.overlay.trigger_complete()  # Keep animation visible, then fade out
+        corner_cfg = self.engine.settings["corners"].get(corner_id, {})
+        action_id = corner_cfg.get("action_id", "none")
+
+        if action_id.startswith("switch_to_profile__"):
+            sw_profile = action_id[len("switch_to_profile__"):]
+            if sw_profile and sw_profile != self.engine.settings.get("current_profile", "Default"):
+                if switch_profile(sw_profile):
+                    self.engine.settings = load_settings()
+                    self._populate_profile_menu()
+                    self.update_tray_menu()
+                    self.engine.reload_settings()
+                    self._animate_profile_switch(sw_profile)
+        elif action_id != "none":
+            execute_action(action_id, SCRIPTS_DIR)
+
+        self.overlay.trigger_complete()
 
     def on_corner_exited(self, corner_id):
         self.overlay.hide_corner()  # Smooth fade-out

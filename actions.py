@@ -245,11 +245,15 @@ def execute_custom_action(action_data):
         for vk in reversed(pressed):
             win32api.keybd_event(vk, 0, win32con.KEYEVENTF_KEYUP, 0)
 
+SWITCH_PROFILE_PREFIX = "switch_to_profile__"
 CUSTOM_ACTION_PREFIX = "__custom__:"
 
 def execute_action(action_id, scripts_dir):
     if action_id in BUILTIN_ACTIONS:
         BUILTIN_ACTIONS[action_id]["func"]()
+    elif action_id.startswith(SWITCH_PROFILE_PREFIX):
+        # Handled in main.py's on_corner_triggered
+        pass
     elif action_id.startswith(CUSTOM_ACTION_PREFIX):
         name = action_id[len(CUSTOM_ACTION_PREFIX):]
         custom_actions = load_custom_actions()

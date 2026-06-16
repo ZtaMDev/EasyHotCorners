@@ -2,21 +2,22 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QCheckBox,
     QPushButton, QDoubleSpinBox, QSpinBox, QScrollArea, QColorDialog,
-    QFrame, QSizePolicy, QStackedWidget, QGroupBox
+    QFrame, QSizePolicy, QStackedWidget, QGroupBox,
+    QInputDialog, QFileDialog, QMessageBox, QDialog, QListWidget, QListWidgetItem
 )
 # pyrefly: ignore [missing-import]
-from PySide6.QtGui import QColor, QPainter, QBrush, QPen, QFont, QLinearGradient
+from PySide6.QtGui import QColor, QPainter, QBrush, QPen, QFont, QLinearGradient, QIcon, QPixmap
 # pyrefly: ignore [missing-import]
-from PySide6.QtCore import Qt, Signal, QSize
-from config import load_settings, save_settings, SCRIPTS_DIR, effective_is_dark
-from actions import BUILTIN_ACTIONS, load_custom_actions, CUSTOM_ACTION_PREFIX
+from PySide6.QtCore import Qt, Signal, QSize, QTimer
+from config import load_settings, save_settings, SCRIPTS_DIR, effective_is_dark, list_profiles, save_profile, load_profile, delete_profile, rename_profile, export_profile, import_profile, switch_profile
+from actions import BUILTIN_ACTIONS, load_custom_actions, CUSTOM_ACTION_PREFIX, SWITCH_PROFILE_PREFIX
 from i18n import t
 from startup import is_startup_enabled, enable_startup, disable_startup
 from action_builder import ActionBuilderDialog
 import os
 
 CORNERS = ["TOP_LEFT", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_RIGHT"]
-ANIMATIONS = ["arc", "corner_bar", "pulse", "fade_box"]
+ANIMATIONS = ["arc", "corner_bar", "pulse", "fade_box", "ripple", "halo"]
 
 # ─────────────────────────────────────────────
 # STYLESHEET
@@ -870,6 +871,11 @@ class CornerPanel(QWidget):
             for f in sorted(os.listdir(SCRIPTS_DIR)):
                 if f.endswith('.py'):
                     self.combo_action.addItem(f"{t('script_prefix', self.lang)}{f}", f)
+        # Switch profile entries
+        from config import list_profiles
+        for p in sorted(list_profiles()):
+            uid = SWITCH_PROFILE_PREFIX + p
+            self.combo_action.addItem(f"  {t('switch_profile', self.lang)}: {p}", uid)
         # Separator + builder
         self.combo_action.insertSeparator(self.combo_action.count())
         self.combo_action.addItem(t("build_custom_action", self.lang), "__open_builder__")
@@ -904,6 +910,228 @@ class CornerPanel(QWidget):
             "color": self.btn_color.color_hex,
             "delay": self.spin_delay.value(),
         }
+
+
+# ─────────────────────────────────────────────
+# Profile Manager Dialog
+# ─────────────────────────────────────────────
+class ProfileManagerDialog(QDialog):
+    def __init__(self, settings, lang, is_dark, parent=None):
+        super().__init__(parent)
+        self.lang = lang
+        self._is_dark = is_dark
+        self._settings = settings
+        self.setWindowTitle(t("profiles", lang))
+        self.setMinimumSize(420, 340)
+        self.setModal(True)
+
+        root = QVBoxLayout(self)
+        root.setSpacing(10)
+        root.setContentsMargins(20, 16, 20, 16)
+
+        # Current profile indicator
+        current = self._settings.get("current_profile", "Default")
+        self._indicator = QLabel(f"  {t('profiles', lang)}:  {current}")
+        self._indicator.setObjectName("section")
+        root.addWidget(self._indicator)
+
+        # Profile list
+        self.profile_list = QListWidget()
+        self.profile_list.setAlternatingRowColors(True)
+        self.profile_list.setSpacing(2)
+        self._refresh_list()
+        self.profile_list.itemDoubleClicked.connect(self._switch)
+        self.profile_list.currentRowChanged.connect(self._on_selection_changed)
+        root.addWidget(self.profile_list)
+
+        # Buttons
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(6)
+
+        self.btn_new = QPushButton("+  " + t("ab_add", lang))
+        self.btn_new.setObjectName("ghostBtn")
+        self.btn_new.setFixedHeight(32)
+        self.btn_new.clicked.connect(self._new)
+        btn_row.addWidget(self.btn_new)
+
+        self.btn_rename = QPushButton(t("profile_rename", lang))
+        self.btn_rename.setObjectName("ghostBtn")
+        self.btn_rename.setFixedHeight(32)
+        self.btn_rename.clicked.connect(self._rename)
+        btn_row.addWidget(self.btn_rename)
+
+        self.btn_delete = QPushButton(t("profile_delete", lang))
+        self.btn_delete.setObjectName("ghostBtn")
+        self.btn_delete.setFixedHeight(32)
+        self.btn_delete.clicked.connect(self._delete)
+        btn_row.addWidget(self.btn_delete)
+
+        btn_row.addStretch()
+
+        self.btn_import = QPushButton(t("profile_import", lang))
+        self.btn_import.setObjectName("ghostBtn")
+        self.btn_import.setFixedHeight(32)
+        self.btn_import.clicked.connect(self._import)
+        btn_row.addWidget(self.btn_import)
+
+        self.btn_export = QPushButton(t("profile_export", lang))
+        self.btn_export.setObjectName("ghostBtn")
+        self.btn_export.setFixedHeight(32)
+        self.btn_export.clicked.connect(self._export)
+        btn_row.addWidget(self.btn_export)
+        root.addLayout(btn_row)
+
+        # Bottom: Save + Done
+        bottom_row = QHBoxLayout()
+        self.btn_save = QPushButton(t("profile_save", lang))
+        self.btn_save.setObjectName("primaryBtn")
+        self.btn_save.setFixedHeight(34)
+        self.btn_save.clicked.connect(self._save)
+        bottom_row.addWidget(self.btn_save)
+        bottom_row.addStretch()
+        self.btn_done = QPushButton(t("ab_done", lang))
+        self.btn_done.setObjectName("primaryBtn")
+        self.btn_done.setFixedHeight(34)
+        self.btn_done.clicked.connect(self.accept)
+        bottom_row.addWidget(self.btn_done)
+        root.addLayout(bottom_row)
+
+        self._on_selection_changed()
+
+    def _refresh_list(self):
+        current = self._settings.get("current_profile", "Default")
+        self.profile_list.blockSignals(True)
+        self.profile_list.clear()
+        for p in list_profiles():
+            item = QListWidgetItem(f"  {p}" if p == current else p)
+            item.setData(Qt.UserRole, p)
+            if p == current:
+                item.setIcon(self._check_icon())
+                f = item.font()
+                f.setBold(True)
+                item.setFont(f)
+            self.profile_list.addItem(item)
+        self.profile_list.blockSignals(False)
+
+    def _check_icon(self):
+        px = QPixmap(14, 14)
+        px.fill(Qt.transparent)
+        p = QPainter(px)
+        p.setPen(QColor("#4ade80"))
+        p.setFont(QFont("Segoe UI", 11))
+        p.drawText(px.rect(), Qt.AlignCenter, "✓")
+        p.end()
+        return QIcon(px)
+
+    def _on_selection_changed(self):
+        has_sel = self.profile_list.currentItem() is not None
+        self.btn_save.setEnabled(has_sel)
+        self.btn_rename.setEnabled(has_sel)
+        self.btn_export.setEnabled(has_sel)
+        self.btn_delete.setEnabled(has_sel and self.profile_list.count() > 1)
+
+    def _selected_name(self):
+        item = self.profile_list.currentItem()
+        return item.data(Qt.UserRole) if item else ""
+
+    def _switch(self):
+        name = self._selected_name()
+        if not name or name == self._settings.get("current_profile", "Default"):
+            return
+        if switch_profile(name):
+            self._settings = load_settings()
+            self._indicator.setText(f"  {t('profiles', self.lang)}:  {name}")
+            self._refresh_list()
+
+    def _save(self):
+        name = self._selected_name()
+        if not name:
+            return
+        data = dict(self._settings)
+        data.pop("current_profile", None)
+        save_profile(name, data)
+
+    def _new(self):
+        name, ok = QInputDialog.getText(self, t("profile_save_as", self.lang), "Profile name:")
+        if not ok or not name.strip():
+            return
+        name = name.strip()
+        if name in list_profiles():
+            QMessageBox.warning(self, "", t("profile_name_exists", self.lang))
+            return
+        from config import DEFAULT_SETTINGS
+        data = dict(DEFAULT_SETTINGS)
+        data.pop("current_profile", None)
+        save_profile(name, data)
+        self._refresh_list()
+        # Auto-switch to new profile
+        if switch_profile(name):
+            self._settings = load_settings()
+            self._indicator.setText(f"  {t('profiles', self.lang)}:  {name}")
+            self._refresh_list()
+
+    def _rename(self):
+        name = self._selected_name()
+        if not name:
+            return
+        new_name, ok = QInputDialog.getText(self, t("profile_rename", self.lang), "New name:", text=name)
+        if not ok or not new_name.strip() or new_name.strip() == name:
+            return
+        new_name = new_name.strip()
+        if new_name in list_profiles():
+            QMessageBox.warning(self, "", t("profile_name_exists", self.lang))
+            return
+        rename_profile(name, new_name)
+        if new_name == self._settings.get("current_profile", "Default"):
+            self._settings["current_profile"] = new_name
+            self._indicator.setText(f"  {t('profiles', self.lang)}:  {new_name}")
+        self._refresh_list()
+
+    def _delete(self):
+        name = self._selected_name()
+        if not name:
+            return
+        if self.profile_list.count() <= 1:
+            QMessageBox.warning(self, "", "Cannot delete the last profile.")
+            return
+        ret = QMessageBox.question(self, t("profile_delete", self.lang),
+                                    t("profile_delete_confirm", self.lang).format(name=name))
+        if ret != QMessageBox.Yes:
+            return
+        delete_profile(name)
+        # If current was deleted, update indicator
+        if name == self._settings.get("current_profile", "Default"):
+            remaining = list_profiles()
+            if remaining:
+                self._settings["current_profile"] = remaining[0]
+                self._indicator.setText(f"  {t('profiles', self.lang)}:  {remaining[0]}")
+        self._refresh_list()
+
+    def _import(self):
+        path, _ = QFileDialog.getOpenFileName(self, t("profile_import", self.lang),
+                                               "", "JSON Files (*.json)")
+        if not path:
+            return
+        name = import_profile(path)
+        if name is None:
+            QMessageBox.warning(self, "", "Failed to import profile.")
+            return
+        self._refresh_list()
+        if switch_profile(name):
+            self._settings = load_settings()
+            self._indicator.setText(f"  {t('profiles', self.lang)}:  {name}")
+            self._refresh_list()
+
+    def _export(self):
+        name = self._selected_name()
+        if not name:
+            return
+        path, _ = QFileDialog.getSaveFileName(self, t("profile_export", self.lang),
+                                               f"{name}.json", "JSON Files (*.json)")
+        if not path:
+            return
+        if not export_profile(name, path):
+            QMessageBox.warning(self, "", "Failed to export profile.")
 
 
 # ─────────────────────────────────────────────
@@ -978,6 +1206,22 @@ class SettingsUI(QWidget):
         self.chk_startup = QCheckBox(t("tray_startup", self.lang))
         self.chk_startup.setChecked(is_startup_enabled())
         sb.addWidget(self.chk_startup)
+
+        sb.addWidget(_divider())
+
+        # Profile indicator + manager
+        sb.addWidget(_section(t("profiles", self.lang)))
+        profile_row = QHBoxLayout()
+        self.lbl_profile_name = QLabel()
+        self.lbl_profile_name.setObjectName("profileName")
+        profile_row.addWidget(self.lbl_profile_name)
+        profile_row.addStretch()
+        self.btn_manage_profiles = QPushButton(t("tray_manage_profiles", self.lang))
+        self.btn_manage_profiles.setObjectName("ghostBtn")
+        self.btn_manage_profiles.clicked.connect(self._open_profile_manager)
+        profile_row.addWidget(self.btn_manage_profiles)
+        sb.addLayout(profile_row)
+        self._refresh_profile_label()
 
         sb.addWidget(_divider())
 
@@ -1119,6 +1363,9 @@ class SettingsUI(QWidget):
         self.btn_scripts.setText(t("tray_scripts", lang))
         self.btn_cancel.setText(t("cancel", lang))
         self.btn_save.setText(t("save_settings", lang))
+        # Profile
+        self._refresh_profile_label()
+        self.btn_manage_profiles.setText(t("tray_manage_profiles", lang))
         self.corner_panel.retranslate(lang)
 
     def _on_lang_changed(self, idx):
@@ -1146,6 +1393,32 @@ class SettingsUI(QWidget):
             enabled = state == Qt.Checked.value if hasattr(Qt.Checked, 'value') else bool(state)
             self.monitor.mark_enabled(corner_id, bool(state))
 
+    # ── Profile methods ──────────────────────────
+
+    def _reload_corner_panel(self):
+        corner_id = self.corner_panel.corner_id
+        if corner_id:
+            corner_data = self.settings["corners"].get(corner_id, {})
+            self.corner_panel.load(corner_id, corner_data, self.settings, self.lang)
+
+    def _refresh_profile_label(self):
+        name = self.settings.get("current_profile", "Default")
+        self.lbl_profile_name.setText(f"  {name}")
+
+    def _open_profile_manager(self):
+        dlg = ProfileManagerDialog(self.settings, self.lang, self._is_dark, self)
+        dlg.exec()
+        # Always reload after manager closes (profiles may have changed)
+        self.settings = load_settings()
+        self._refresh_profile_label()
+        self.monitor.settings = self.settings
+        self.monitor.update()
+        self._reload_corner_panel()
+        self._retranslate_ui()
+        self.engine.reload_settings()
+        if hasattr(self.engine, 'app_instance'):
+            self.engine.app_instance.update_tray_menu()
+
     def _save_panel_to_settings(self, corner_id):
         self.settings["corners"][corner_id] = self.corner_panel.collect()
 
@@ -1171,6 +1444,11 @@ class SettingsUI(QWidget):
         self.settings["polling_interval"] = self.spin_poll.value()
         self.settings["multi_monitor"] = self.chk_mm.isChecked()
         self.settings["block_any_maximized"] = self.chk_block_any.isChecked()
+        # Save current profile
+        name = self.settings.get("current_profile", "Default")
+        data = dict(self.settings)
+        data.pop("current_profile", None)
+        save_profile(name, data)
 
     def _apply(self):
         self._gather()
