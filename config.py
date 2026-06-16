@@ -1,5 +1,6 @@
 import os
 import json
+import winreg
 
 APP_NAME = "EasyHotCorners"
 APPDATA_DIR = os.path.join(os.environ.get('APPDATA', ''), APP_NAME)
@@ -19,6 +20,21 @@ DEFAULT_SETTINGS = {
         "BOTTOM_RIGHT": {"enabled": False, "action_id": "none", "delay": 0.4, "animation": "pulse", "color": "#ffffff", "allow_maximized": True}
     }
 }
+
+def is_dark_mode():
+    try:
+        registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+        key = winreg.OpenKey(registry, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
+        value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
+        return value == 0
+    except Exception:
+        return False
+
+def effective_is_dark(settings):
+    theme = settings.get("theme", "system")
+    if theme == "system":
+        return is_dark_mode()
+    return theme == "dark"
 
 def init_appdata():
     os.makedirs(APPDATA_DIR, exist_ok=True)

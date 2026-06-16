@@ -39,7 +39,7 @@
             </h1>
             <p class="hero__subtitle">A lightweight, modular hot corner manager for Windows 11.<br>Assign actions to any corner of your screen with animated visual feedback.</p>
             <div class="hero__buttons">
-                <a href="https://github.com/ZtaMDev/EasyHotCorners/releases/download/v1.0.0/EasyHotCorners_v1.0.0.exe" class="btn btn--primary" id="downloadBtn">
+                <a href="https://github.com/ZtaMDev/EasyHotCorners/releases/download/v1.0.1/EasyHotCorners_v1.0.1.exe" class="btn btn--primary" id="downloadBtn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Download for Windows
                 </a>
@@ -47,11 +47,12 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
                     GitHub
                 </a>
-                <a href="https://github.com/ZtaMDev" class="btn btn--ghost" target="_blank" rel="noopener">
-                    ZMDev
+                <a href="https://github.com/ZtaMDev/EasyHotCorners/releases" class="btn btn--ghost" target="_blank" rel="noopener">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    All Releases
                 </a>
             </div>
-            <p class="hero__version">v1.0.0 — Free &amp; Open Source</p>
+            <p class="hero__version">v1.0.1 — Free &amp; Open Source</p>
         </div>
         <div class="hero__scroll-hint" id="scrollHint">
             <span>Scroll to explore</span>
@@ -168,13 +169,21 @@
 
                 <div class="feature-card" data-delay="5">
                     <div class="feature-card__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    </div>
+                    <h3>Custom Action Builder</h3>
+                    <p>Create actions visually — launch apps, open URLs, or send hotkeys — without writing a single line of Python. Python scripting still fully supported for power users.</p>
+                </div>
+
+                <div class="feature-card" data-delay="6">
+                    <div class="feature-card__icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     </div>
                     <h3>Theme &amp; Language</h3>
                     <p>Dark, Light, or System auto-detect themes. English and Spanish out of the box.</p>
                 </div>
 
-                <div class="feature-card" data-delay="6">
+                <div class="feature-card" data-delay="7">
                     <div class="feature-card__icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                     </div>
@@ -182,7 +191,7 @@
                     <p>Hot corners span seamlessly across all connected screens. Turn it on or off as needed.</p>
                 </div>
 
-                <div class="feature-card" data-delay="7">
+                <div class="feature-card" data-delay="8">
                     <div class="feature-card__icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                     </div>
@@ -209,10 +218,22 @@
                 <div class="action-pill">Quick Settings (Win+A)</div>
                 <div class="action-pill">Notifications (Win+N)</div>
                 <div class="action-pill">Widgets (Win+W)</div>
-                <div class="action-pill">Virtual Desktop Switcher</div>
+                <div class="action-pill">Next Virtual Desktop</div>
+                <div class="action-pill">Previous Virtual Desktop</div>
                 <div class="action-pill">Task Manager</div>
-                <div class="action-pill">Run Custom Script</div>
+                <div class="action-pill">Open File Explorer</div>
+                <div class="action-pill">Turn Off Display</div>
+                <div class="action-pill">Run Dialog (Win+R)</div>
+                <div class="action-pill">Snip &amp; Sketch (Win+Shift+S)</div>
+                <div class="action-pill">Clipboard History (Win+V)</div>
+                <div class="action-pill">Emoji Panel (Win+.)</div>
+                <div class="action-pill">Volume Up</div>
+                <div class="action-pill">Volume Down</div>
+                <div class="action-pill">Play / Pause Media</div>
+                <div class="action-pill">Next Track</div>
+                <div class="action-pill">Previous Track</div>
             </div>
+            <p class="section-subtitle" style="margin-top: 20px;">Plus <strong>Custom Actions</strong> built with the Action Builder (launch apps, open URLs, send hotkeys) and any <strong>Python script</strong> dropped into the scripts folder.</p>
         </div>
     </section>
 
@@ -251,14 +272,55 @@ if __name__ == "__main__":
         </div>
     </section>
 
+    <!-- ===== ACTION BUILDER ===== -->
+    <section id="action-builder" class="scripting">
+        <div class="container">
+            <h2 class="section-title">Custom Action Builder</h2>
+            <p class="section-subtitle">No coding required. Build powerful actions in seconds: launch any application, open a URL in your default browser, or send keyboard hotkeys.</p>
+
+            <div class="screenshot-row">
+                <div class="screenshot-card">
+                    <img src="actionbuilder.png" alt="Custom Action Builder dialog" class="screenshot-img" loading="lazy" style="width:100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+                    <p class="screenshot-caption">The Action Builder dialog — create, edit, and manage your custom actions.</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 20px; text-align: center; color: var(--text-secondary);">
+                Python scripting is still fully supported for advanced users who need more control.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===== SCREENSHOTS ===== -->
+    <section id="screenshots" class="download-cta" style="background: var(--bg-primary);">
+        <div class="container">
+            <h2 class="section-title">Screenshots</h2>
+            <p class="section-subtitle">A look at the redesigned settings experience.</p>
+            <div class="screenshot-row" style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-top: 40px;">
+                <div class="screenshot-card" style="max-width: 600px; flex: 1; min-width: 300px;">
+                    <img src="settings.png" alt="EasyHotCorners Settings Window" class="screenshot-img" loading="lazy" style="width:100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+                    <p class="screenshot-caption" style="margin-top: 12px; color: var(--text-secondary); text-align: center;">Settings window with per-corner configuration.</p>
+                </div>
+                <div class="screenshot-card" style="max-width: 600px; flex: 1; min-width: 300px;">
+                    <img src="actionbuilder.png" alt="Custom Action Builder" class="screenshot-img" loading="lazy" style="width:100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+                    <p class="screenshot-caption" style="margin-top: 12px; color: var(--text-secondary); text-align: center;">Action Builder — create custom actions visually.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== DOWNLOAD CTA ===== -->
     <section id="download" class="download-cta">
         <div class="container">
             <h2>Ready to optimize your workflow?</h2>
             <p>EasyHotCorners is free, open source, and takes less than 5 MB.</p>
-            <a href="https://github.com/ZtaMDev/EasyHotCorners/releases/download/v1.0.0/EasyHotCorners_v1.0.0.exe" class="btn btn--primary btn--lg">
+            <a href="https://github.com/ZtaMDev/EasyHotCorners/releases/download/v1.0.1/EasyHotCorners_v1.0.1.exe" class="btn btn--primary btn--lg">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download v1.0.0
+                Download v1.0.1
+            </a>
+            <a href="https://github.com/ZtaMDev/EasyHotCorners/releases" class="btn btn--outline btn--lg" style="margin-top: 15px;" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                View All Releases
             </a>
         </div>
     </section>

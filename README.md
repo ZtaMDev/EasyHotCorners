@@ -8,6 +8,14 @@ A lightweight, modular hot corner manager for Windows 11. Assign actions to any 
 
 ---
 
+## Screenshots
+
+| Settings Window | Action Builder |
+|---|---|
+| ![Settings](site/settings.png) | ![Action Builder](site/actionbuilder.png) |
+
+---
+
 ## Features
 
 - **Four independent hot corners** — Top Left, Top Right, Bottom Left, Bottom Right, each fully configurable.
@@ -16,26 +24,28 @@ A lightweight, modular hot corner manager for Windows 11. Assign actions to any 
 - **Configurable delay** — Set how long the mouse must dwell in a corner before the action fires (0.1 s – 5.0 s).
 - **System Tray integration** — The application lives in the Windows system tray. No persistent window is shown while idle.
 - **Smart Window suppression** — Hot corners are automatically suppressed when a fullscreen application is active. Activation in maximized applications can be toggled on or off individually per corner.
-- **Built-in actions:**
-  - Toggle desktop icons (show / hide)
-  - Lock screen
-  - Show desktop (Win + D)
-  - Mute / unmute system volume
-  - Task View (Win + Tab)
-  - Start Menu (Win)
-  - Quick Settings (Win + A)
-  - Notification Center (Win + N)
-  - Widgets Board (Win + W)
-  - Next Virtual Desktop (Win + Ctrl + Right)
-  - Previous Virtual Desktop (Win + Ctrl + Left)
-  - Task Manager (Ctrl + Shift + Esc)
-- **Custom Python scripts** — Drop any `.py` file into the scripts folder and it will appear as a selectable action inside the settings window.
-- **Extensible API** — An `easy_api.py` file is provided in the scripts folder as a reusable helper base you can import from your own scripts.
+- **Action Builder** — Create custom actions visually from the settings UI: launch any application, open a URL, or send keyboard hotkeys. No coding required.
+- **Custom Python scripts** — Drop any `.py` file into the scripts folder and it will appear as a selectable action inside the settings window. Fully compatible with the Action Builder.
+- **Update system** — Background update check at startup, clickable tray notification, in-app download with progress bar, and auto-install.
+- **Version display** in the tray menu.
 - **Multi-Monitor Support** — Hot corners can span seamlessly across all connected screens.
 - **Advanced Optimization** — Customize the trigger area radius (pixels) and fine-tune the CPU polling interval for ultimate performance control.
-- **Premium User Interface** — A completely redesigned, dark-themed Settings UI with inline tooltips and live apply.
+- **Premium User Interface** — A completely redesigned Settings UI with inline tooltips, live apply, and Light/Dark themes.
 - **Theme support** — Dark, Light, or automatic System theme (reads the Windows registry).
-- **Language support** — English and Spanish, selectable from the settings window.
+- **Language support** — English and Spanish, selectable from the settings window with immediate retranslation.
+
+### Built-in Actions (24 total)
+
+| Category | Actions |
+|---|---|
+| Desktop | Toggle Desktop Icons, Show Desktop (Win+D) |
+| System | Lock Screen, Task Manager, Turn Off Display, Open File Explorer |
+| Volume | Mute / Unmute, Volume Up, Volume Down |
+| Media | Play / Pause, Next Track, Previous Track |
+| Windows | Start Menu, Task View (Win+Tab), Quick Settings (Win+A), Notifications (Win+N), Widgets (Win+W) |
+| Virtual Desktops | Next Virtual Desktop, Previous Virtual Desktop |
+| Utilities | Run Dialog (Win+R), Snip & Sketch (Win+Shift+S), Clipboard History (Win+V), Emoji Panel (Win+.) |
+| Custom | Action Builder (launch apps, URLs, hotkeys), Python scripts |
 
 ---
 
@@ -69,7 +79,7 @@ The application starts silently in the system tray. Right-click the tray icon to
    ```
    pip install pyinstaller
    ```
-2. Run the build command (also available in `export.txt`):
+2. Run the build command:
    ```
    pyinstaller --noconfirm --onefile --windowed --icon="icon.ico" --name="EasyHotCorners" --add-data "icon.ico;." main.py
    ```
@@ -87,7 +97,7 @@ All settings are stored in `%APPDATA%\EasyHotCorners\settings.json` and are edit
 | Theme           | Color scheme: System (auto-detect), Dark, or Light.                  |
 | Enable          | Toggle a corner on or off individually.                              |
 | Allow Maximized | Allow hot corner triggers even if a window is maximized (optional).   |
-| Action          | Built-in action or custom script to execute.                         |
+| Action          | Built-in action, custom action, or custom script to execute.         |
 | Animation       | Visual style shown while dwelling in the corner.                      |
 | Color           | Color of the animation overlay.                                      |
 | Delay           | Dwell time in seconds before the action fires.                       |
@@ -115,20 +125,36 @@ Example structure:
 
 ---
 
+## Action Builder
+
+The Action Builder lets you create custom actions without writing any Python code:
+
+- **Launch App / File** — Pick any executable or document on your system.
+- **Open URL** — Opens a website in your default browser.
+- **Send Hotkey** — Simulate any keyboard shortcut (Ctrl+C, Win+D, etc.).
+
+Open the Action Builder from the Settings window by clicking **"Add Custom Action"**. Your custom actions appear alongside the built-in ones in the action dropdown.
+
+---
+
 ## Project Structure
 
-| File               | Purpose                                                     |
-| ------------------ | ----------------------------------------------------------- |
-| `main.py`          | Application entry point, system tray, theme management.     |
-| `engine.py`        | Mouse position polling at ~60 Hz, corner detection signals. |
-| `overlay_ui.py`    | Transparent overlay window, animation rendering.            |
-| `settings_ui.py`   | Configuration window built with PySide6.                    |
-| `config.py`        | Settings persistence (`%APPDATA%\EasyHotCorners`).          |
-| `actions.py`       | Built-in action definitions and script execution.           |
-| `i18n.py`          | English and Spanish translation strings.                    |
-| `icon.svg`         | Application icon (source format).                           |
-| `export.txt`       | PyInstaller build command reference.                        |
-| `requirements.txt` | Python dependency list.                                     |
+| File                 | Purpose                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| `main.py`            | Application entry point, system tray, theme management.     |
+| `engine.py`          | Mouse position polling at ~60 Hz, corner detection signals. |
+| `overlay_ui.py`      | Transparent overlay window, animation rendering.            |
+| `settings_ui.py`     | Configuration window built with PySide6.                    |
+| `action_builder.py`  | Custom Action Builder dialog (launch apps, URLs, hotkeys).  |
+| `config.py`          | Settings persistence (`%APPDATA%\EasyHotCorners`).          |
+| `actions.py`         | Built-in action definitions and script execution.           |
+| `i18n.py`            | English and Spanish translation strings.                    |
+| `update_manager.py`  | GitHub release check and download logic.                    |
+| `version.py`         | Centralized version string (`VERSION = "1.0.1"`).           |
+| `download_dialog.py` | Download dialog with real progress bar and cancel support.  |
+| `icon.svg`           | Application icon (source format).                           |
+| `export.txt`         | PyInstaller build command reference.                        |
+| `requirements.txt`   | Python dependency list.                                     |
 
 ---
 

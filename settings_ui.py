@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QColor, QPainter, QBrush, QPen, QFont, QLinearGradient
 # pyrefly: ignore [missing-import]
 from PySide6.QtCore import Qt, Signal, QSize
-from config import load_settings, save_settings, SCRIPTS_DIR
+from config import load_settings, save_settings, SCRIPTS_DIR, effective_is_dark
 from actions import BUILTIN_ACTIONS, load_custom_actions, CUSTOM_ACTION_PREFIX
 from i18n import t
 from startup import is_startup_enabled, enable_startup, disable_startup
@@ -60,6 +60,14 @@ QLabel#sectionLabel:disabled {
     color: #3f3f56;
 }
 /* ── Corner areas are painted, not styled via QSS ── */
+/* ── Corner panel title ── */
+QLabel#cornerTitle {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #a78bfa;
+    padding: 0;
+    margin: 0;
+}
 /* ── ComboBox ── */
 QComboBox {
     background-color: #16161f;
@@ -218,9 +226,228 @@ QScrollBar::handle:vertical {
 }
 QScrollBar::handle:vertical:hover { background: #555577; }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+/* ── Bottom bar ── */
+#bottomBar {
+    background-color: #0a0a12;
+    border-top: 1px solid #1e1e2e;
+}
 /* ── Divider ── */
 QFrame#divider { background-color: #1e1e2e; max-height: 1px; }
 QFrame#divider:disabled { background-color: #14141f; }
+"""
+
+QSS_LIGHT = """
+QWidget {
+    background-color: #f5f5f7;
+    color: #2c2c3a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 10pt;
+}
+QWidget:disabled {
+    color: #a0a0b0;
+}
+/* ── Scroll Areas ── */
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+/* ── Sidebar ── */
+#sidebar {
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e8;
+}
+#sidebarContent {
+    background-color: #ffffff;
+}
+/* ── Right panel ── */
+#rightPanel {
+    background-color: #f5f5f7;
+}
+/* ── Section labels ── */
+QLabel#sectionLabel {
+    color: #88889a;
+    font-size: 8pt;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding-bottom: 2px;
+}
+QLabel#sectionLabel:disabled {
+    color: #c0c0ce;
+}
+/* ── ComboBox ── */
+QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #c8c8d0;
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #2c2c3a;
+    min-height: 28px;
+}
+QComboBox:hover { border-color: #7c3aed; }
+QComboBox:disabled {
+    background-color: #e8e8ec;
+    border-color: #d0d0d8;
+    color: #a0a0b0;
+}
+QComboBox::drop-down { border: none; width: 26px; }
+QComboBox::down-arrow {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #7c3aed;
+    margin-right: 8px;
+}
+QComboBox::down-arrow:disabled {
+    border-top-color: #c0c0ce;
+}
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #c8c8d0;
+    selection-background-color: #7c3aed;
+    selection-color: #ffffff;
+    outline: none;
+}
+/* ── SpinBox ── */
+QSpinBox, QDoubleSpinBox {
+    background-color: #ffffff;
+    border: 1px solid #c8c8d0;
+    border-radius: 6px;
+    padding: 5px 8px;
+    color: #2c2c3a;
+    min-height: 28px;
+}
+QSpinBox:hover, QDoubleSpinBox:hover { border-color: #7c3aed; }
+QSpinBox:disabled, QDoubleSpinBox:disabled {
+    background-color: #e8e8ec;
+    border-color: #d0d0d8;
+    color: #a0a0b0;
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+    subcontrol-origin: border; subcontrol-position: top right;
+    width: 18px; border-left: 1px solid #c8c8d0;
+    border-top-right-radius: 5px; background-color: #ececf0;
+}
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    subcontrol-origin: border; subcontrol-position: bottom right;
+    width: 18px; border-left: 1px solid #c8c8d0;
+    border-bottom-right-radius: 5px; background-color: #ececf0;
+}
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+    background-color: #7c3aed;
+}
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+    border-left: 3px solid transparent; border-right: 3px solid transparent;
+    border-bottom: 4px solid #7c3aed; width: 0; height: 0;
+}
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+    border-left: 3px solid transparent; border-right: 3px solid transparent;
+    border-top: 4px solid #7c3aed; width: 0; height: 0;
+}
+/* ── Checkbox ── */
+QCheckBox { spacing: 10px; color: #2c2c3a; }
+QCheckBox:disabled {
+    color: #a0a0b0;
+}
+QCheckBox::indicator {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 2px solid #c8c8d0; background-color: #ffffff;
+}
+QCheckBox::indicator:hover { border-color: #7c3aed; }
+QCheckBox::indicator:disabled {
+    border-color: #d0d0d8;
+    background-color: #e8e8ec;
+}
+QCheckBox::indicator:checked {
+    background-color: #7c3aed; border-color: #7c3aed;
+}
+QCheckBox::indicator:checked:disabled {
+    background-color: #c0c0ce; border-color: #c0c0ce;
+}
+QCheckBox#enableCheck {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #1a1a2a;
+}
+QCheckBox#enableCheck:disabled {
+    color: #a0a0b0;
+}
+QCheckBox#enableCheck::indicator { width: 20px; height: 20px; }
+/* ── Buttons ── */
+QPushButton {
+    background-color: #e8e8ec;
+    border: 1px solid #c8c8d0;
+    border-radius: 6px;
+    padding: 8px 18px;
+    color: #2c2c3a;
+    font-weight: bold;
+    min-height: 32px;
+}
+QPushButton:hover {
+    background-color: #7c3aed;
+    color: #ffffff;
+    border-color: #7c3aed;
+}
+QPushButton:pressed { background-color: #6d28d9; color: #fff; }
+QPushButton:disabled {
+    background-color: #e8e8ec;
+    border-color: #d0d0d8;
+    color: #a0a0b0;
+}
+QPushButton#primaryBtn {
+    background-color: #7c3aed;
+    color: #ffffff;
+    border-color: #7c3aed;
+}
+QPushButton#primaryBtn:hover { background-color: #6d28d9; color: #fff; }
+QPushButton#primaryBtn:disabled {
+    background-color: #c0c0ce;
+    border-color: #c0c0ce;
+    color: #e0e0e8;
+}
+QPushButton#ghostBtn {
+    background-color: transparent;
+    border-color: #7c3aed;
+    color: #7c3aed;
+}
+QPushButton#ghostBtn:hover {
+    background-color: #7c3aed;
+    color: #ffffff;
+    border-color: #7c3aed;
+}
+QPushButton#ghostBtn:disabled {
+    border-color: #c8c8d0;
+    color: #a0a0b0;
+    background-color: transparent;
+}
+QPushButton#ghostBtn:checked {
+    background-color: rgba(124,58,237,0.12);
+    color: #7c3aed;
+}
+/* ── Corner panel title ── */
+QLabel#cornerTitle {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #7c3aed;
+    padding: 0;
+    margin: 0;
+}
+/* ── Scrollbar ── */
+QScrollBar:vertical {
+    background: #ffffff; width: 10px; margin: 0;
+}
+QScrollBar::handle:vertical {
+    background: #c8c8d0; min-height: 24px; border-radius: 5px; margin: 2px;
+}
+QScrollBar::handle:vertical:hover { background: #a0a0b0; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+/* ── Bottom bar ── */
+#bottomBar {
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e8;
+}
+/* ── Divider ── */
+QFrame#divider { background-color: #e0e0e8; max-height: 1px; }
+QFrame#divider:disabled { background-color: #e8e8ec; }
 """
 
 MONITOR_SVG = b"""<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg">
@@ -266,8 +493,8 @@ def _info(tip):
     lbl.setFixedSize(16, 16)
     lbl.setAlignment(Qt.AlignCenter)
     lbl.setStyleSheet(
-        "background:#1e1e2e; color:#a78bfa; border-radius:8px; "
-        "font-weight:bold; font-size:8pt;"
+        "color:#a78bfa; border:1px solid #a78bfa; border-radius:8px; "
+        "font-weight:bold; font-size:8pt; background:transparent;"
     )
     lbl.setToolTip(tip)
     return lbl
@@ -298,34 +525,60 @@ class MonitorWidget(QWidget):
         "BOTTOM_LEFT": "BL", "BOTTOM_RIGHT": "BR",
     }
 
-    # ── colours
-    C_BG      = QColor("#0a0a12")
-    C_BEZEL   = QColor("#1e1e2e")
-    C_SCREEN  = QColor("#0d0d18")
-    C_IDLE    = QColor(160, 160, 200, 30)
-    C_IDLE_BD = QColor("#2a2a44")
-    C_HOV     = QColor(167, 139, 250, 55)
-    C_HOV_BD  = QColor("#a78bfa")
-    C_ACT     = QColor(167, 139, 250, 90)
-    C_ACT_BD  = QColor("#a78bfa")
-    C_ENA     = QColor(74, 222, 128, 45)
-    C_ENA_BD  = QColor("#4ade80")
-    C_TEXT_IDLE = QColor("#55557a")
-    C_TEXT_HOV  = QColor("#a78bfa")
-    C_TEXT_ACT  = QColor("#c4b5fd")
-    C_TEXT_ENA  = QColor("#4ade80")
-
     ZONE = 54   # corner zone size in px (within screen area)
 
-    def __init__(self, settings, lang="en"):
+    def __init__(self, settings, lang="en", is_dark=True):
         super().__init__()
         self.settings = settings
         self.lang = lang
+        self._is_dark = is_dark
+        self._init_colors()
         self.active = "TOP_LEFT"
         self._hover = None
         self.setFixedSize(280, 200)
         self.setMouseTracking(True)
         self.setCursor(Qt.PointingHandCursor)
+
+    def _init_colors(self):
+        if self._is_dark:
+            self.C_BG      = QColor("#0a0a12")
+            self.C_BEZEL   = QColor("#1e1e2e")
+            self.C_SCREEN  = QColor("#0d0d18")
+            self.C_IDLE    = QColor(160, 160, 200, 30)
+            self.C_IDLE_BD = QColor("#2a2a44")
+            self.C_HOV     = QColor(167, 139, 250, 55)
+            self.C_HOV_BD  = QColor("#a78bfa")
+            self.C_ACT     = QColor(167, 139, 250, 90)
+            self.C_ACT_BD  = QColor("#a78bfa")
+            self.C_ENA     = QColor(74, 222, 128, 45)
+            self.C_ENA_BD  = QColor("#4ade80")
+            self.C_TEXT_IDLE = QColor("#55557a")
+            self.C_TEXT_HOV  = QColor("#a78bfa")
+            self.C_TEXT_ACT  = QColor("#c4b5fd")
+            self.C_TEXT_ENA  = QColor("#4ade80")
+            self._wallpaper_grad = [(20, 18, 40, 120), (10, 10, 20, 120)]
+        else:
+            self.C_BG      = QColor("#f0f0f2")
+            self.C_BEZEL   = QColor("#d4d4dc")
+            self.C_SCREEN  = QColor("#ffffff")
+            self.C_IDLE    = QColor(180, 180, 210, 40)
+            self.C_IDLE_BD = QColor("#c8c8d0")
+            self.C_HOV     = QColor(124, 58, 237, 50)
+            self.C_HOV_BD  = QColor("#7c3aed")
+            self.C_ACT     = QColor(124, 58, 237, 85)
+            self.C_ACT_BD  = QColor("#7c3aed")
+            self.C_ENA     = QColor(34, 197, 94, 45)
+            self.C_ENA_BD  = QColor("#22c55e")
+            self.C_TEXT_IDLE = QColor("#a0a0b0")
+            self.C_TEXT_HOV  = QColor("#7c3aed")
+            self.C_TEXT_ACT  = QColor("#6d28d9")
+            self.C_TEXT_ENA  = QColor("#22c55e")
+            self._wallpaper_grad = [(200, 200, 220, 80), (220, 220, 240, 60)]
+
+    def set_theme(self, is_dark):
+        self._is_dark = is_dark
+        self._init_colors()
+        self.update()
 
     # ── geometry helpers ──────────────────────
     def _screen_rect(self):
@@ -396,8 +649,9 @@ class MonitorWidget(QWidget):
 
         # ── Subtle desktop wallpaper gradient ──
         grad = QLinearGradient(sx, sy, sx+sw, sy+sh)
-        grad.setColorAt(0, QColor(20, 18, 40, 120))
-        grad.setColorAt(1, QColor(10, 10, 20, 120))
+        c0, c1 = self._wallpaper_grad
+        grad.setColorAt(0, QColor(*c0))
+        grad.setColorAt(1, QColor(*c1))
         p.setBrush(QBrush(grad))
         p.drawRoundedRect(sx, sy, sw, sh, 6, 6)
 
@@ -466,10 +720,11 @@ class MonitorWidget(QWidget):
 # Corner editor panel (right side)
 # ─────────────────────────────────────────────
 class CornerPanel(QWidget):
-    def __init__(self, lang="en"):
+    def __init__(self, lang="en", is_dark=True):
         super().__init__()
         self.setObjectName("rightPanel")
         self.lang = lang
+        self._is_dark = is_dark
         self.corner_id = None
         self._on_enabled_change = None  # callback
 
@@ -479,7 +734,7 @@ class CornerPanel(QWidget):
 
         # Corner title
         self.lbl_title = QLabel("—")
-        self.lbl_title.setStyleSheet("font-size: 14pt; font-weight: bold; color: #a78bfa;")
+        self.lbl_title.setObjectName("cornerTitle")
         root.addWidget(self.lbl_title)
 
         root.addWidget(_divider())
@@ -492,30 +747,38 @@ class CornerPanel(QWidget):
         root.addWidget(_divider())
 
         # Action row
-        root.addWidget(_section(t("action", lang).replace(":", "")))
-        action_row = QHBoxLayout()
+        self._sec_action = _section(t("action", lang).replace(":", ""))
+        root.addWidget(self._sec_action)
         self.combo_action = QComboBox()
         self.combo_action.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        btn_build = QPushButton(t("action_builder_btn", lang))
-        btn_build.setObjectName("ghostBtn")
-        btn_build.setFixedHeight(32)
-        btn_build.setToolTip(t("build_custom_action", lang))
-        btn_build.clicked.connect(self._open_builder)
-        action_row.addWidget(self.combo_action)
-        action_row.addWidget(btn_build)
-        root.addLayout(action_row)
+        self.combo_action.currentIndexChanged.connect(self._on_action_changed)
+        root.addWidget(self.combo_action)
+
+        self.btn_build = QPushButton(t("action_builder_btn", lang))
+        self.btn_build.setObjectName("ghostBtn")
+        self.btn_build.setFixedHeight(32)
+        self.btn_build.setToolTip(t("build_custom_action", lang))
+        self.btn_build.clicked.connect(self._open_builder)
+        root.addSpacing(4)
+        build_row = QHBoxLayout()
+        build_row.addStretch()
+        build_row.addWidget(self.btn_build)
+        build_row.addStretch()
+        root.addLayout(build_row)
 
         # Animation + Color row
         anim_color_row = QHBoxLayout()
         anim_col = QVBoxLayout()
-        anim_col.addWidget(_section(t("animation", lang).replace(":", "")))
+        self._sec_anim = _section(t("animation", lang).replace(":", ""))
+        anim_col.addWidget(self._sec_anim)
         self.combo_anim = QComboBox()
         for anim_id in ANIMATIONS:
             self.combo_anim.addItem(t(f"anim_{anim_id}", lang), anim_id)
         anim_col.addWidget(self.combo_anim)
 
         color_col = QVBoxLayout()
-        color_col.addWidget(_section(t("color", lang).replace(":", "")))
+        self._sec_color = _section(t("color", lang).replace(":", ""))
+        color_col.addWidget(self._sec_color)
         self.btn_color = ColorButton()
         color_col.addWidget(self.btn_color)
 
@@ -526,9 +789,10 @@ class CornerPanel(QWidget):
 
         # Delay row
         delay_row = QHBoxLayout()
-        delay_lbl = _section(t("delay", lang).replace(":", ""))
-        delay_row.addWidget(delay_lbl)
-        delay_row.addWidget(_info(t("info_delay", lang)))
+        self._sec_delay = _section(t("delay", lang).replace(":", ""))
+        delay_row.addWidget(self._sec_delay)
+        self._info_delay = _info(t("info_delay", lang))
+        delay_row.addWidget(self._info_delay)
         delay_row.addStretch()
         self.spin_delay = QDoubleSpinBox()
         self.spin_delay.setRange(0.05, 5.0)
@@ -544,8 +808,33 @@ class CornerPanel(QWidget):
         root.addStretch()
         self.setEnabled(False)
 
+    def retranslate(self, lang):
+        self.lang = lang
+        self.lbl_title.setText(t(self.corner_id, lang) if self.corner_id else "—")
+        self.chk_enable.setText(t("enable", lang))
+        self._sec_action.setText(t("action", lang).replace(":", "").upper())
+        self._sec_anim.setText(t("animation", lang).replace(":", "").upper())
+        self._sec_color.setText(t("color", lang).replace(":", "").upper())
+        self._sec_delay.setText(t("delay", lang).replace(":", "").upper())
+        self.btn_build.setText(t("action_builder_btn", lang))
+        self.btn_build.setToolTip(t("build_custom_action", lang))
+        self._info_delay.setToolTip(t("info_delay", lang))
+        self.chk_maximized.setText(t("allow_maximized", lang))
+        # Rebuild action combo items (keep current selection)
+        current_data = self.combo_action.currentData()
+        self._rebuild_actions(current_data if current_data != "__open_builder__" else "none", {})
+        # Rebuild animation combo items
+        current_anim = self.combo_anim.currentData() or "pulse"
+        self.combo_anim.blockSignals(True)
+        self.combo_anim.clear()
+        for anim_id in ANIMATIONS:
+            self.combo_anim.addItem(t(f"anim_{anim_id}", lang), anim_id)
+        idx = self.combo_anim.findData(current_anim)
+        if idx >= 0: self.combo_anim.setCurrentIndex(idx)
+        self.combo_anim.blockSignals(False)
+
     def _open_builder(self):
-        dlg = ActionBuilderDialog(self, self.lang)
+        dlg = ActionBuilderDialog(self, self.lang, self._is_dark)
         if dlg.exec():
             # Refresh action combobox after builder closes
             if hasattr(self, '_refresh_action_combo'):
@@ -560,7 +849,8 @@ class CornerPanel(QWidget):
         curr_anim = corner_data.get("animation", "pulse")
         idx = self.combo_anim.findData(curr_anim)
         if idx >= 0: self.combo_anim.setCurrentIndex(idx)
-        self.btn_color = ColorButton(corner_data.get("color", "#ffffff"))
+        self.btn_color.color_hex = corner_data.get("color", "#ffffff")
+        self.btn_color._refresh()
         self.spin_delay.setValue(corner_data.get("delay", 0.4))
         self.chk_maximized.setChecked(corner_data.get("allow_maximized", False))
         self.setEnabled(True)
@@ -582,15 +872,16 @@ class CornerPanel(QWidget):
         # Separator + builder
         self.combo_action.insertSeparator(self.combo_action.count())
         self.combo_action.addItem(t("build_custom_action", self.lang), "__open_builder__")
-        # Set current
+        # Set current (block signals to avoid triggering _on_action_changed)
+        self.combo_action.blockSignals(True)
         idx = self.combo_action.findData(current_action)
         if idx >= 0:
             self.combo_action.setCurrentIndex(idx)
-        self.combo_action.currentIndexChanged.connect(self._on_action_changed)
+        self.combo_action.blockSignals(False)
 
     def _on_action_changed(self, idx):
         if self.combo_action.currentData() == "__open_builder__":
-            dlg = ActionBuilderDialog(self, self.lang)
+            dlg = ActionBuilderDialog(self, self.lang, self._is_dark)
             dlg.exec()
             # Refresh and restore to none
             prev = self.combo_action.currentIndex()
@@ -626,7 +917,9 @@ class SettingsUI(QWidget):
 
         self.setWindowTitle(t("settings_title", self.lang))
         self.setMinimumSize(820, 540)
-        self.setStyleSheet(QSS)
+
+        self._is_dark = effective_is_dark(self.settings)
+        self.apply_qss()
 
         root = QHBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -650,7 +943,7 @@ class SettingsUI(QWidget):
         sb.setSpacing(14)
 
         # Monitor widget
-        self.monitor = MonitorWidget(self.settings, self.lang)
+        self.monitor = MonitorWidget(self.settings, self.lang, self._is_dark)
         self.monitor.corner_clicked.connect(self._on_corner_clicked)
         sb.addWidget(self.monitor, 0, Qt.AlignHCenter)
 
@@ -660,20 +953,24 @@ class SettingsUI(QWidget):
         sb.addWidget(_section("General"))
 
         lang_row = QHBoxLayout()
-        lang_row.addWidget(QLabel(t("language", self.lang)))
+        self.lbl_lang = QLabel(t("language", self.lang))
+        lang_row.addWidget(self.lbl_lang)
         self.lang_combo = QComboBox()
         self.lang_combo.addItem("English", "en")
         self.lang_combo.addItem("Español", "es")
         idx = self.lang_combo.findData(self.lang)
         if idx >= 0: self.lang_combo.setCurrentIndex(idx)
+        self.lang_combo.currentIndexChanged.connect(self._on_lang_changed)
         lang_row.addWidget(self.lang_combo)
         sb.addLayout(lang_row)
 
         theme_row = QHBoxLayout()
-        theme_row.addWidget(QLabel(t("theme", self.lang)))
+        self.lbl_theme = QLabel(t("theme", self.lang))
+        theme_row.addWidget(self.lbl_theme)
         self.theme_combo = QComboBox()
         self.theme_combo.addItems(["system", "dark", "light"])
         self.theme_combo.setCurrentText(self.settings.get("theme", "system"))
+        self.theme_combo.currentTextChanged.connect(self._on_theme_changed)
         theme_row.addWidget(self.theme_combo)
         sb.addLayout(theme_row)
 
@@ -696,8 +993,10 @@ class SettingsUI(QWidget):
         adv_l.setSpacing(10)
 
         radius_row = QHBoxLayout()
-        radius_row.addWidget(QLabel(t("radius", self.lang)))
-        radius_row.addWidget(_info(t("info_radius", self.lang)))
+        self.lbl_radius = QLabel(t("radius", self.lang))
+        radius_row.addWidget(self.lbl_radius)
+        self._info_radius = _info(t("info_radius", self.lang))
+        radius_row.addWidget(self._info_radius)
         radius_row.addStretch()
         self.spin_radius = QSpinBox()
         self.spin_radius.setRange(1, 100)
@@ -707,8 +1006,10 @@ class SettingsUI(QWidget):
         adv_l.addLayout(radius_row)
 
         poll_row = QHBoxLayout()
-        poll_row.addWidget(QLabel(t("polling_interval", self.lang)))
-        poll_row.addWidget(_info(t("info_polling", self.lang)))
+        self.lbl_poll = QLabel(t("polling_interval", self.lang))
+        poll_row.addWidget(self.lbl_poll)
+        self._info_poll = _info(t("info_polling", self.lang))
+        poll_row.addWidget(self._info_poll)
         poll_row.addStretch()
         self.spin_poll = QSpinBox()
         self.spin_poll.setRange(1, 500)
@@ -721,7 +1022,8 @@ class SettingsUI(QWidget):
         self.chk_mm = QCheckBox(t("multi_monitor", self.lang))
         self.chk_mm.setChecked(self.settings.get("multi_monitor", True))
         mm_row.addWidget(self.chk_mm)
-        mm_row.addWidget(_info(t("info_multi_monitor", self.lang)))
+        self._info_mm = _info(t("info_multi_monitor", self.lang))
+        mm_row.addWidget(self._info_mm)
         mm_row.addStretch()
         adv_l.addLayout(mm_row)
 
@@ -745,38 +1047,33 @@ class SettingsUI(QWidget):
         panel_scroll.setWidgetResizable(True)
         panel_scroll.setFrameShape(QFrame.NoFrame)
 
-        self.corner_panel = CornerPanel(self.lang)
+        self.corner_panel = CornerPanel(self.lang, self._is_dark)
         panel_scroll.setWidget(self.corner_panel)
         rw_layout.addWidget(panel_scroll)
 
         # Bottom bar
         bar = QWidget()
-        bar.setStyleSheet("background-color: #0a0a12; border-top: 1px solid #1e1e2e;")
+        bar.setObjectName("bottomBar")
         bar.setFixedHeight(58)
         bar_l = QHBoxLayout(bar)
         bar_l.setContentsMargins(20, 10, 20, 10)
         bar_l.setSpacing(10)
 
-        btn_scripts = QPushButton(t("tray_scripts", self.lang))
-        btn_scripts.setObjectName("ghostBtn")
-        btn_scripts.clicked.connect(self._open_scripts)
+        self.btn_scripts = QPushButton(t("tray_scripts", self.lang))
+        self.btn_scripts.setObjectName("ghostBtn")
+        self.btn_scripts.clicked.connect(self._open_scripts)
 
-        btn_cancel = QPushButton(t("cancel", self.lang))
-        btn_cancel.clicked.connect(self.hide)
+        self.btn_cancel = QPushButton(t("cancel", self.lang))
+        self.btn_cancel.clicked.connect(self.hide)
 
-        btn_apply = QPushButton(t("apply", self.lang))
-        btn_apply.setObjectName("ghostBtn")
-        btn_apply.clicked.connect(self._apply)
+        self.btn_save = QPushButton(t("save_settings", self.lang))
+        self.btn_save.setObjectName("primaryBtn")
+        self.btn_save.clicked.connect(self._save_close)
 
-        btn_save = QPushButton(t("save_settings", self.lang))
-        btn_save.setObjectName("primaryBtn")
-        btn_save.clicked.connect(self._save_close)
-
-        bar_l.addWidget(btn_scripts)
+        bar_l.addWidget(self.btn_scripts)
         bar_l.addStretch()
-        bar_l.addWidget(btn_cancel)
-        bar_l.addWidget(btn_apply)
-        bar_l.addWidget(btn_save)
+        bar_l.addWidget(self.btn_cancel)
+        bar_l.addWidget(self.btn_save)
         rw_layout.addWidget(bar)
 
         root.addWidget(right_wrap)
@@ -785,6 +1082,48 @@ class SettingsUI(QWidget):
         self._on_corner_clicked("TOP_LEFT")
         # Connect enable checkbox to monitor refresh
         self.corner_panel.chk_enable.stateChanged.connect(self._on_enable_change)
+
+    def apply_qss(self):
+        self.setStyleSheet(QSS_LIGHT if not self._is_dark else QSS)
+
+    def _on_theme_changed(self, theme_text):
+        self._is_dark = effective_is_dark({**self.settings, "theme": theme_text})
+        self.apply_qss()
+        self.monitor.set_theme(self._is_dark)
+        self.corner_panel._is_dark = self._is_dark
+        self.settings["theme"] = theme_text
+        save_settings(self.settings)
+        self.engine.reload_settings()
+        if hasattr(self.engine, 'app_instance'):
+            self.engine.app_instance.apply_theme()
+            self.engine.app_instance.update_tray_menu()
+
+    def _retranslate_ui(self):
+        lang = self.lang
+        self.setWindowTitle(t("settings_title", lang))
+        self.lbl_lang.setText(t("language", lang))
+        self.lbl_theme.setText(t("theme", lang))
+        self.chk_startup.setText(t("tray_startup", lang))
+        self.btn_adv.setText(t("advanced_options", lang) + (" ▾" if self.btn_adv.isChecked() else " ▸"))
+        self.lbl_radius.setText(t("radius", lang))
+        self.lbl_poll.setText(t("polling_interval", lang))
+        self.chk_mm.setText(t("multi_monitor", lang))
+        self._info_radius.setToolTip(t("info_radius", lang))
+        self._info_poll.setToolTip(t("info_polling", lang))
+        self._info_mm.setToolTip(t("info_multi_monitor", lang))
+        self.btn_scripts.setText(t("tray_scripts", lang))
+        self.btn_cancel.setText(t("cancel", lang))
+        self.btn_save.setText(t("save_settings", lang))
+        self.corner_panel.retranslate(lang)
+
+    def _on_lang_changed(self, idx):
+        self.lang = self.lang_combo.currentData()
+        self.settings["language"] = self.lang
+        save_settings(self.settings)
+        self.engine.reload_settings()
+        if hasattr(self.engine, 'app_instance'):
+            self.engine.app_instance.update_tray_menu()
+        self._retranslate_ui()
 
     def _on_corner_clicked(self, corner_id):
         # Save current before switching
@@ -837,6 +1176,7 @@ class SettingsUI(QWidget):
             disable_startup()
         if hasattr(self.engine, 'app_instance'):
             self.engine.app_instance.update_tray_menu()
+            self.engine.app_instance.apply_theme()
 
     def _save_close(self):
         self._apply()

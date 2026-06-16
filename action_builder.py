@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from actions import load_custom_actions, save_custom_actions, CUSTOM_ACTION_PREFIX
 from i18n import t
+from config import load_settings, effective_is_dark
 
 # Key name -> VK code
 KEY_MAP = {
@@ -131,16 +132,132 @@ QFrame#divider {
     background-color: #333344;
     max-height: 1px;
 }
+#sidebarAB {
+    background-color: #0d0d14;
+    border-right: 1px solid #1e1e2e;
+}
+"""
+
+DIALOG_QSS_LIGHT = """
+QDialog, QWidget {
+    background-color: #f5f5f7;
+    color: #2c2c3a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 10pt;
+}
+QListWidget {
+    background-color: #ffffff;
+    border: 1px solid #c8c8d0;
+    border-radius: 6px;
+    padding: 4px;
+    outline: none;
+}
+QListWidget::item {
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+QListWidget::item:selected {
+    background-color: #7c3aed;
+    color: #ffffff;
+}
+QListWidget::item:hover:!selected {
+    background-color: #ececf0;
+}
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #c8c8d0;
+    border-radius: 4px;
+    padding: 6px 10px;
+    color: #2c2c3a;
+    font-size: 10pt;
+}
+QLineEdit:focus {
+    border-color: #7c3aed;
+}
+QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #c8c8d0;
+    border-radius: 4px;
+    padding: 5px 8px;
+    color: #2c2c3a;
+}
+QComboBox:hover { border-color: #7c3aed; }
+QComboBox::drop-down { border: none; width: 24px; }
+QComboBox::down-arrow {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #7c3aed;
+    margin-right: 8px;
+}
+QPushButton {
+    background-color: #e8e8ec;
+    border: 1px solid #c8c8d0;
+    border-radius: 5px;
+    padding: 7px 16px;
+    color: #2c2c3a;
+    font-weight: bold;
+    min-width: 70px;
+}
+QPushButton:hover {
+    background-color: #7c3aed;
+    color: #ffffff;
+    border-color: #7c3aed;
+}
+QPushButton:pressed { background-color: #6d28d9; }
+QPushButton#primaryBtn {
+    background-color: #7c3aed;
+    color: #ffffff;
+    border-color: #7c3aed;
+}
+QPushButton#primaryBtn:hover { background-color: #6d28d9; }
+QPushButton#dangerBtn {
+    background-color: transparent;
+    border-color: #ef4444;
+    color: #ef4444;
+}
+QPushButton#dangerBtn:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+QCheckBox { spacing: 8px; color: #2c2c3a; }
+QCheckBox::indicator {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 2px solid #c8c8d0;
+    background-color: #ffffff;
+}
+QCheckBox::indicator:checked {
+    background-color: #7c3aed;
+    border-color: #7c3aed;
+}
+QLabel#sectionLabel {
+    color: #7c3aed;
+    font-weight: bold;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+QFrame#divider {
+    background-color: #c8c8d0;
+    max-height: 1px;
+}
+#sidebarAB {
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e8;
+}
 """
 
 
 class ActionBuilderDialog(QDialog):
-    def __init__(self, parent=None, lang="en"):
+    def __init__(self, parent=None, lang="en", is_dark=None):
         super().__init__(parent)
         self.lang = lang
+        if is_dark is None:
+            is_dark = effective_is_dark(load_settings())
+        self._is_dark = is_dark
         self.setWindowTitle(t("ab_title", lang))
         self.setMinimumSize(680, 460)
-        self.setStyleSheet(DIALOG_QSS)
+        self.setStyleSheet(DIALOG_QSS if is_dark else DIALOG_QSS_LIGHT)
         self.custom_actions = load_custom_actions()
         self.current_name = None
 
@@ -150,8 +267,8 @@ class ActionBuilderDialog(QDialog):
 
         # ---- Left sidebar: list of actions ----
         sidebar = QWidget()
+        sidebar.setObjectName("sidebarAB")
         sidebar.setFixedWidth(220)
-        sidebar.setStyleSheet("background-color: #0d0d14; border-right: 1px solid #1e1e2e;")
         sb_layout = QVBoxLayout(sidebar)
         sb_layout.setContentsMargins(12, 16, 12, 12)
         sb_layout.setSpacing(8)
@@ -187,7 +304,7 @@ class ActionBuilderDialog(QDialog):
         ph_lbl = QLabel(t("ab_placeholder", lang))
         ph_lbl.setAlignment(Qt.AlignCenter)
         ph_lbl.setWordWrap(True)
-        ph_lbl.setStyleSheet("color: #555577; font-size: 10pt; padding: 40px;")
+        ph_lbl.setStyleSheet("font-size: 10pt; padding: 40px;")
         ph_layout.addWidget(ph_lbl)
         self.right_stack.addWidget(placeholder_page)
 
